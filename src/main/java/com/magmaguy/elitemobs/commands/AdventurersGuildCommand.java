@@ -1,8 +1,9 @@
 package com.magmaguy.elitemobs.commands;
 
-import com.magmaguy.elitemobs.adventurersguild.AdventurersGuildGUI;
+import com.magmaguy.elitemobs.adventurersguild.AdventurersGuildMenu;
+import com.magmaguy.elitemobs.combattag.TeleportTag;
 import com.magmaguy.elitemobs.config.AdventurersGuildConfig;
-import com.magmaguy.elitemobs.config.ConfigValues;
+import com.magmaguy.elitemobs.config.CombatTagConfig;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -12,14 +13,17 @@ public class AdventurersGuildCommand {
 
     public AdventurersGuildCommand(Player player) {
 
-        if (ConfigValues.adventurersGuildConfig.getBoolean(AdventurersGuildConfig.AG_TELEPORT))
+        if (AdventurersGuildConfig.agTeleport)
             for (World world : Bukkit.getWorlds())
-                if (world.getName().equals(ConfigValues.adventurersGuildConfig.getString(AdventurersGuildConfig.GUILD_WORLD_NAME))) {
+                if (world.getName().equals(AdventurersGuildConfig.guildWorldName)) {
+
+                    if (!player.hasPermission("elitemobs.adventurersguild.teleport")) return;
+
                     Location location;
                     double x = 0, y = 0, z = 0;
                     float yaw = 0, pitch = 0;
                     int counter = 0;
-                    for (String substring : ConfigValues.adventurersGuildConfig.getString(AdventurersGuildConfig.GUILD_WORLD_LOCATION).split(",")) {
+                    for (String substring : AdventurersGuildConfig.guildWorldLocation.split(",")) {
                         switch (counter) {
                             case 0:
                                 x = Double.parseDouble(substring);
@@ -40,12 +44,15 @@ public class AdventurersGuildCommand {
                         counter++;
                     }
                     location = new Location(world, x, y, z, yaw, pitch);
-                    player.teleport(location);
+                    if (CombatTagConfig.enableCombatTag)
+                        TeleportTag.initializePlayerTeleport(player, CombatTagConfig.teleportTimerDuration, location);
+                    else
+                        player.teleport(location);
                     return;
                 }
 
-
-        AdventurersGuildGUI.mainMenu(player);
+        if (!player.hasPermission("elitemobs.adventurersguild.menu")) return;
+        AdventurersGuildMenu.mainMenu(player);
 
     }
 

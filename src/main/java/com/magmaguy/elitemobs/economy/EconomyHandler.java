@@ -31,6 +31,11 @@ public class EconomyHandler {
 
     public static void addCurrency(UUID user, double amount) {
 
+        if (VaultCompatibility.VAULT_ENABLED) {
+            VaultCompatibility.addVaultCurrency(user, amount);
+            return;
+        }
+
         if (!checkUserExists(user)) createUser(user);
 
         PlayerData.playerCurrency.put(user, roundDecimals(checkCurrency(user) + amount));
@@ -41,6 +46,11 @@ public class EconomyHandler {
 
     public static void subtractCurrency(UUID user, double amount) {
 
+        if (VaultCompatibility.VAULT_ENABLED) {
+            VaultCompatibility.subtractCurrency(user, amount);
+            return;
+        }
+
         if (!checkUserExists(user)) createUser(user);
 
         PlayerData.playerCurrency.put(user, roundDecimals(checkCurrency(user) - amount));
@@ -50,6 +60,11 @@ public class EconomyHandler {
 
     public static void setCurrency(UUID user, double amount) {
 
+        if (VaultCompatibility.VAULT_ENABLED) {
+            VaultCompatibility.setCurrency(user, amount);
+            return;
+        }
+
         if (!checkUserExists(user)) createUser(user);
 
         PlayerData.playerCurrency.put(user, roundDecimals(amount));
@@ -58,6 +73,10 @@ public class EconomyHandler {
     }
 
     public static double checkCurrency(UUID user) {
+
+        if (VaultCompatibility.VAULT_ENABLED) {
+            return VaultCompatibility.checkCurrency(user);
+        }
 
         if (!checkUserExists(user))
             createUser(user);

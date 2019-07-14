@@ -4,8 +4,8 @@ import com.magmaguy.elitemobs.EntityTracker;
 import com.magmaguy.elitemobs.config.ConfigValues;
 import com.magmaguy.elitemobs.config.MobCombatSettingsConfig;
 import com.magmaguy.elitemobs.mobconstructor.EliteMobEntity;
-import com.magmaguy.elitemobs.mobpowers.ElitePower;
-import com.magmaguy.elitemobs.mobpowers.majorpowers.*;
+import com.magmaguy.elitemobs.powers.ElitePower;
+import com.magmaguy.elitemobs.powers.MajorPower;
 import com.magmaguy.elitemobs.utils.VersionChecker;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -90,33 +90,27 @@ public class MajorPowerPowerStance implements Listener {
 
         ArrayList<Object> effects = new ArrayList<>();
 
-        for (ElitePower elitePower : eliteMobEntity.getPowers()) {
-
-            if (elitePower instanceof SkeletonPillar)
-                effects.add(addEffect(Material.BONE));
-
-            if (elitePower instanceof SkeletonTrackingArrow)
-                effects.add(addEffect(Material.TIPPED_ARROW));
-
-            if (elitePower instanceof ZombieBloat)
-                effects.add(addEffect(Material.RED_MUSHROOM));
-
-            if (elitePower instanceof ZombieFriends)
-                effects.add(addEffect(Material.SKULL_ITEM));
-
-            if (elitePower instanceof ZombieNecronomicon)
-                effects.add(addEffect(Material.WRITTEN_BOOK));
-
-            if (elitePower instanceof ZombieParents)
-                effects.add(addEffect(Material.MONSTER_EGG));
-
-            if (elitePower instanceof ZombieTeamRocket)
-                effects.add(addEffect(Material.FIREWORK));
-
-        }
+        for (ElitePower elitePower : eliteMobEntity.getPowers())
+            if (elitePower instanceof MajorPower)
+                if (eliteMobEntity.getPower(elitePower).getTrail() != null)
+                    effects.add(effectParser(eliteMobEntity.getPower(elitePower).getTrail()));
 
         return effects;
 
+    }
+
+    private Object effectParser(String powerString) {
+        try {
+            Material material = Material.valueOf(powerString);
+            return addEffect(material);
+        } catch (Exception ex) {
+        }
+        try {
+            Particle particle = Particle.valueOf(powerString);
+            return addEffect(particle);
+        } catch (Exception ex) {
+        }
+        return null;
     }
 
     private Object addEffect(Material material) {
@@ -133,9 +127,7 @@ public class MajorPowerPowerStance implements Listener {
     }
 
     private Object addEffect(Particle particle) {
-
         return particle;
-
     }
 
 }

@@ -1,22 +1,6 @@
-/*
- *  This program is free software: you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License as published by
- *  the Free Software Foundation, either version 3 of the License, or
- *  (at your option) any later version.
- *
- *  This program is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
- *
- *  You should have received a copy of the GNU General Public License
- *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
-
 package com.magmaguy.elitemobs.commands;
 
-import com.magmaguy.elitemobs.items.CustomItemConstructor;
-import com.magmaguy.elitemobs.items.uniqueitems.UniqueItemInitializer;
+import com.magmaguy.elitemobs.items.customitems.CustomItem;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -61,7 +45,7 @@ public class LootGUI implements Listener {
 
     private void headerConstructor(Inventory inventory) {
 
-        ItemStack arrowLeft = new ItemStack(Material.SKULL_ITEM, 1, (short) 3);
+        ItemStack arrowLeft = new ItemStack(Material.LEGACY_SKULL_ITEM, 1, (short) 3);
         SkullMeta arrowLeftSkullMeta = (SkullMeta) arrowLeft.getItemMeta();
         arrowLeftSkullMeta.setOwner("MHF_ArrowLeft");
         arrowLeftSkullMeta.setDisplayName("Previous Item Ranks");
@@ -70,7 +54,7 @@ public class LootGUI implements Listener {
         inventory.setItem(0, arrowLeft);
 
 
-        ItemStack arrowRight = new ItemStack(Material.SKULL_ITEM, 1, (short) 3);
+        ItemStack arrowRight = new ItemStack(Material.LEGACY_SKULL_ITEM, 1, (short) 3);
         SkullMeta arrowRightSkullMeta = (SkullMeta) arrowRight.getItemMeta();
         arrowRightSkullMeta.setOwner("MHF_ArrowRight");
         arrowRightSkullMeta.setDisplayName("Next Item Ranks");
@@ -79,7 +63,7 @@ public class LootGUI implements Listener {
         inventory.setItem(8, arrowRight);
 
 
-        ItemStack signature = new ItemStack(Material.SKULL_ITEM, 1, (short) 3);
+        ItemStack signature = new ItemStack(Material.LEGACY_SKULL_ITEM, 1, (short) 3);
         SkullMeta signatureSkullMeta = (SkullMeta) signature.getItemMeta();
         signatureSkullMeta.setOwner("magmaguy");
         signatureSkullMeta.setDisplayName("EliteMobs by MagmaGuy");
@@ -103,7 +87,7 @@ public class LootGUI implements Listener {
         tierSlots.add(6);
         tierSlots.add(7);
 
-        List<Integer> keySet = new ArrayList<>(CustomItemConstructor.dynamicRankedItemStacks.keySet());
+        List<Integer> keySet = new ArrayList<>(CustomItem.getTieredLoot().keySet());
 
         int counter = 1;
 
@@ -131,7 +115,7 @@ public class LootGUI implements Listener {
 
     private void lootNavigationConstructor(Inventory inventory) {
 
-        ItemStack arrowLeft = new ItemStack(Material.SKULL_ITEM, 1, (short) 3);
+        ItemStack arrowLeft = new ItemStack(Material.LEGACY_SKULL_ITEM, 1, (short) 3);
         SkullMeta arrowLeftSkullMeta = (SkullMeta) arrowLeft.getItemMeta();
         arrowLeftSkullMeta.setOwner("MHF_ArrowLeft");
         arrowLeftSkullMeta.setDisplayName("Previous Loot Page");
@@ -140,7 +124,7 @@ public class LootGUI implements Listener {
         inventory.setItem(27, arrowLeft);
 
 
-        ItemStack arrowRight = new ItemStack(Material.SKULL_ITEM, 1, (short) 3);
+        ItemStack arrowRight = new ItemStack(Material.LEGACY_SKULL_ITEM, 1, (short) 3);
         SkullMeta arrowRightSkullMeta = (SkullMeta) arrowRight.getItemMeta();
         arrowRightSkullMeta.setOwner("MHF_ArrowRight");
         arrowRightSkullMeta.setDisplayName("Next Loot Page");
@@ -153,11 +137,8 @@ public class LootGUI implements Listener {
     private void lootConstructor(Inventory inventory) {
 
         List<ItemStack> getLootList = new ArrayList<>();
-        for (List<ItemStack> list : CustomItemConstructor.dynamicRankedItemStacks.values())
+        for (List<ItemStack> list : CustomItem.getTieredLoot().values())
             getLootList.addAll(list);
-
-        getLootList.addAll(CustomItemConstructor.staticCustomItemHashMap.keySet());
-        getLootList.addAll(UniqueItemInitializer.uniqueItemsList);
 
         int counter = 1;
 
@@ -173,11 +154,11 @@ public class LootGUI implements Listener {
 
             } else {
 
-                List<ItemStack> currentRankloot = CustomItemConstructor.dynamicRankedItemStacks.get(filterRank);
+                List<ItemStack> currentRankLoot = CustomItem.getTieredLoot().get(filterRank);
 
-                if (currentRankloot.size() >= counter + ((currentLootPage - 1) * 35)) {
+                if (currentRankLoot.size() >= counter + ((currentLootPage - 1) * 35)) {
 
-                    inventory.setItem(number, currentRankloot.get(counter - 1 + ((currentLootPage - 1) * 35)));
+                    inventory.setItem(number, currentRankLoot.get(counter - 1 + ((currentLootPage - 1) * 35)));
 
                 }
 
@@ -192,7 +173,7 @@ public class LootGUI implements Listener {
     @EventHandler
     public void onClick(InventoryClickEvent event) {
 
-        if (event.getInventory().getName().equalsIgnoreCase(shopName)) {
+        if (event.getView().getTitle().equalsIgnoreCase(shopName)) {
 
             if (event.getCurrentItem() == null || event.getCurrentItem().getType().equals(Material.AIR)) {
 

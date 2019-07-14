@@ -1,18 +1,3 @@
-/*
- *  This program is free software: you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License as published by
- *  the Free Software Foundation, either version 3 of the License, or
- *  (at your option) any later version.
- *
- *  This program is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
- *
- *  You should have received a copy of the GNU General Public License
- *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
-
 package com.magmaguy.elitemobs.config;
 
 import com.magmaguy.elitemobs.MetadataHandler;
@@ -31,13 +16,9 @@ public class DefaultConfig {
     public static final String ENABLE_PERMISSION_TITLES = "Use titles to warn players they are missing a permission";
     public static final String ENABLE_POWER_SCOREBOARDS = "Use scoreboards to display mob powers using permissions";
     public static final String HIDE_ENCHANTMENTS_ATTRIBUTE = "Hide enchantment attributes on plugin-generated items";
-    public static final String PREVENT_ITEM_PICKUP = "Prevent item pickup for elite mobs";
     public static final String PREVENT_ELITE_MOB_CONVERSION_OF_NAMED_MOBS = "Make aggressive named mobs unable to become Elite Mobs";
     public static final String PREVENT_MOUNT_EXPLOIT = "Prevent Minecraft living entity mount exploit for Elite Mobs";
     public static final String STRICT_SPAWNING_RULES = "Strict spawning rules mode for better compatibility with other plugins";
-    public static final String PREVENT_TOWER_EXPLOIT = "Prevent tower exploit";
-    public static final String PREVENT_DARKROOM_EXPLOIT = "Prevent dark room spawner exploit";
-    public static final String PREVENT_ENDERMAN_HEIGHT_EXPLOIT = "Prevent enderman height exploit";
     public static final String SKULL_SIGNATURE_ITEM = "Use a skull for signature item";
 
     public void loadConfiguration() {
@@ -51,13 +32,9 @@ public class DefaultConfig {
         configuration.addDefault(ENABLE_POWER_SCOREBOARDS, false);
         configuration.addDefault(ALWAYS_SHOW_NAMETAGS, false);
         configuration.addDefault(HIDE_ENCHANTMENTS_ATTRIBUTE, false);
-        configuration.addDefault(PREVENT_ITEM_PICKUP, true);
         configuration.addDefault(PREVENT_ELITE_MOB_CONVERSION_OF_NAMED_MOBS, true);
         configuration.addDefault(STRICT_SPAWNING_RULES, false);
         configuration.addDefault(PREVENT_MOUNT_EXPLOIT, true);
-        configuration.addDefault(PREVENT_TOWER_EXPLOIT, true);
-        configuration.addDefault(PREVENT_DARKROOM_EXPLOIT, true);
-        configuration.addDefault(PREVENT_ENDERMAN_HEIGHT_EXPLOIT, true);
         configuration.addDefault(SKULL_SIGNATURE_ITEM, true);
 
         configuration.options().copyDefaults(true);

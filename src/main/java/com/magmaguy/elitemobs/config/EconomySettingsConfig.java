@@ -33,9 +33,32 @@ public class EconomySettingsConfig {
     public static final String CURRENCY_NAME = "Currency name";
     public static final String SHOP_NAME = "Shop name";
     public static final String CUSTOM_SHOP_NAME = "Custom shop name";
+    public static final String BUY_OR_SELL_SHOP_NAME = "Buy or sell shop name";
     public static final String SIGNATURE_ITEM_LOCATION_SHOPS = "Reroll button location for EliteMobs Shops";
     public static final String SHOP_VALID_SLOTS = "Valid chest slots for EliteMobs Shop";
     public static final String CUSTOM_SHOP_VALID_SLOTS = "Valid chest slots for EliteMobs Custom Shop";
+    public static final String SELL_SHOP_NAME = "Sell shop name";
+    public static final String SELL_SHOP_VALID_SLOTS = "Valid chest slots for EliteMobs Sell Shop";
+    public static final String SELL_SHOP_INFO_SLOT = "Sell shop info slot";
+    public static final String SELL_SHOP_INFO_NAME = "Sell shop info item name";
+    public static final String SELL_SHOP_INFO_LORE = "Sell shop info item lore";
+    public static final String SELL_SHOP_CANCEL_SLOT = "Sell shop cancel slot";
+    public static final String SELL_SHOP_CANCEL_NAME = "Sell shop cancel name";
+    public static final String SELL_SHOP_CANCEL_LORE = "Sell shop cancel lore";
+    public static final String SELL_SHOP_CONFIRM_SLOT = "Sell shop confirm slot";
+    public static final String SELL_SHOP_CONFIRM_NAME = "Sell shop confirm name";
+    public static final String SELL_SHOP_CONFIRM_LORE = "Sell shop confirm lore";
+
+    public static final String USE_VAULT = "Use Vault instead of Elite Coins (BAD IDEA)";
+
+    public static final String CURRENCY_SHOWER_MULTIPLIER = "Tier multiplier for currency payout on Elite Mob death";
+    public static final String CURRENCY_LOOT_MESSAGE = "Currency loot message";
+    public static final String ENABLE_CURRENCY_SHOWER = "Enable currency shower";
+    public static final String CURRENCY_SHOWER_MESSAGE_1 = "Currency shower message for 1 currency";
+    public static final String CURRENCY_SHOWER_MESSAGE_5 = "Currency shower message for 5 currency";
+    public static final String CURRENCY_SHOWER_MESSAGE_10 = "Currency shower message for 10 currency";
+    public static final String CURRENCY_SHOWER_MESSAGE_20 = "Currency shower message for 20 currency";
+    public static final String CURRENCY_AG_NOTIFICATION = "Adventurers Guild notification message";
 
     private static final String MATERIAL_WORTH = "Material worth.";
     public static final String DIAMOND_AXE = MATERIAL_WORTH + "DIAMOND_AXE";
@@ -132,6 +155,9 @@ public class EconomySettingsConfig {
     public static final String VANISHING_CURSE = ENCHANTMENT_WORTH + "VANISHING_CURSE";
     public static final String WATER_WORKER = ENCHANTMENT_WORTH + "WATER_WORKER";
 
+    public static final String FLAMETHROWER = ENCHANTMENT_WORTH + "FLAMETHROWER";
+    public static final String HUNTER = ENCHANTMENT_WORTH + "HUNTER";
+
     private static final String POTION_EFFECT_WORTH = "Potion effect worth.";
     public static final String ABSORPTION = POTION_EFFECT_WORTH + "ABSORPTION";
     public static final String BLINDNESS = POTION_EFFECT_WORTH + "BLINDNESS";
@@ -176,8 +202,9 @@ public class EconomySettingsConfig {
         configuration.addDefault(LOWEST_PROCEDURALLY_SIMULATED_LOOT, 1);
         configuration.addDefault(HIGHEST_PROCEDURALLY_SIMULATED_LOOT, 5);
         configuration.addDefault(CURRENCY_NAME, "Elite Coins");
-        configuration.addDefault(SHOP_NAME, "EliteMobs Shop");
-        configuration.addDefault(CUSTOM_SHOP_NAME, "EliteMobs Custom Shop");
+        configuration.addDefault(SHOP_NAME, "[EM] Shop");
+        configuration.addDefault(CUSTOM_SHOP_NAME, "[EM] Custom Shop");
+        configuration.addDefault(BUY_OR_SELL_SHOP_NAME, "[EM] Buy/Sell");
         configuration.addDefault(SIGNATURE_ITEM_LOCATION_SHOPS, 4);
         configuration.addDefault(SHOP_VALID_SLOTS, Arrays.asList(9, 10, 11, 12, 13, 14, 15, 16, 17, 18,
                 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45,
@@ -185,6 +212,34 @@ public class EconomySettingsConfig {
         configuration.addDefault(CUSTOM_SHOP_VALID_SLOTS, Arrays.asList(9, 10, 11, 12, 13, 14, 15, 16, 17, 18,
                 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45,
                 46, 47, 48, 49, 50, 51, 52, 53));
+
+        configuration.addDefault(SELL_SHOP_NAME, "[EM] Sell Menu");
+        configuration.addDefault(SELL_SHOP_INFO_SLOT, 8);
+        configuration.addDefault(SELL_SHOP_INFO_NAME, "&cWarning!");
+        configuration.addDefault(SELL_SHOP_INFO_LORE, Arrays.asList(
+                "&cYou can only sell special",
+                "&cElite Mobs drops in this",
+                "&cshop! These should have",
+                "&ca value on their lore."));
+        configuration.addDefault(SELL_SHOP_CANCEL_SLOT, 27);
+        configuration.addDefault(SELL_SHOP_CANCEL_NAME, "&4Cancel");
+        configuration.addDefault(SELL_SHOP_CANCEL_LORE, Arrays.asList("&cCancel sale!"));
+        configuration.addDefault(SELL_SHOP_CONFIRM_SLOT, 35);
+        configuration.addDefault(SELL_SHOP_CONFIRM_NAME, "&2Confirm sale!");
+        configuration.addDefault(SELL_SHOP_CONFIRM_LORE, Arrays.asList("&aSell items for", "&a$currency_amount $currency_name"));
+        configuration.addDefault(SELL_SHOP_VALID_SLOTS, Arrays.asList(19, 20, 21, 22, 23, 24, 25, 28, 29, 30, 31, 32, 33,
+                34, 37, 38, 39, 40, 41, 42, 43));
+
+        configuration.addDefault(USE_VAULT, false);
+
+        configuration.addDefault(CURRENCY_SHOWER_MULTIPLIER, 1);
+        configuration.addDefault(CURRENCY_LOOT_MESSAGE, "&7[EM] You've picked up &a$amount $currency_name!");
+        configuration.addDefault(ENABLE_CURRENCY_SHOWER, true);
+        configuration.addDefault(CURRENCY_SHOWER_MESSAGE_1, "&7[EM] You've picked up 1 $currency_name!");
+        configuration.addDefault(CURRENCY_SHOWER_MESSAGE_5, "&7[EM] You've picked up &f5 &7$currency_name!");
+        configuration.addDefault(CURRENCY_SHOWER_MESSAGE_10, "&7[EM] You've picked up &a10 &7$currency_name!");
+        configuration.addDefault(CURRENCY_SHOWER_MESSAGE_20, "&7[EM] You've picked up &220 &7$currency_name!");
+        configuration.addDefault(CURRENCY_AG_NOTIFICATION, "&7[EM] Extra spending money? Try &a/ag &7or &a/em shop&7!");
 
         configuration.addDefault(DIAMOND_AXE, diamondLevel);
         configuration.addDefault(DIAMOND_BARDING, diamondLevel);
@@ -278,6 +333,9 @@ public class EconomySettingsConfig {
         configuration.addDefault(THORNS, diamondLevel);
         configuration.addDefault(VANISHING_CURSE, -1);
         configuration.addDefault(WATER_WORKER, 1);
+
+        configuration.addDefault(FLAMETHROWER, 5);
+        configuration.addDefault(HUNTER, 3);
 
         configuration.addDefault(ABSORPTION, (diamondLevel) * 10);
         configuration.addDefault(BLINDNESS, (diamondLevel / 2) * 10);

@@ -3,13 +3,12 @@ package com.magmaguy.elitemobs.npcs;
 import com.magmaguy.elitemobs.ChatColorConverter;
 import com.magmaguy.elitemobs.EntityTracker;
 import com.magmaguy.elitemobs.MetadataHandler;
-import com.magmaguy.elitemobs.config.ConfigValues;
-import com.magmaguy.elitemobs.config.NPCConfig;
+import com.magmaguy.elitemobs.config.npcs.NPCsConfigFields;
 import com.magmaguy.elitemobs.npcs.chatter.NPCChatBubble;
+import com.magmaguy.elitemobs.utils.WarningMessage;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
-import org.bukkit.configuration.Configuration;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
@@ -25,11 +24,11 @@ import java.util.concurrent.ThreadLocalRandom;
 
 public class NPCEntity {
 
-    private static HashSet<NPCEntity> npcEntityList = new HashSet<>();
+    private static HashSet<NPCEntity> npcEntityHashSet = new HashSet<>();
 
     private Villager villager;
 
-    private String key;
+    private NPCsConfigFields npCsConfigFields;
     private String name;
     private String role;
     private ArmorStand roleDisplay;
@@ -51,12 +50,12 @@ public class NPCEntity {
      *
      * @return List of all NPCEntities
      */
-    public static HashSet<NPCEntity> getNPCEntityList() {
-        return npcEntityList;
+    private static HashSet<NPCEntity> getNPCEntityList() {
+        return npcEntityHashSet;
     }
 
     public static void addNPCEntity(NPCEntity npcEntity) {
-        npcEntityList.add(npcEntity);
+        npcEntityHashSet.add(npcEntity);
     }
 
     /**
@@ -67,53 +66,48 @@ public class NPCEntity {
     public static void removeNPCEntity(NPCEntity npcEntity) {
         npcEntity.villager.remove();
         npcEntity.roleDisplay.remove();
-        npcEntityList.remove(npcEntity);
+        npcEntityHashSet.remove(npcEntity);
     }
 
     /**
-     * Gets a specific NPCEntity based on the config key they have
+     * Gets a specific NPCEntity based on the config npCsConfigFields they have
      *
-     * @param key Key of the NPCEntity to get
-     * @return NPCEntity associated to this key
+     * @param npCsConfigFields Fields to compare
+     * @return NPCEntity associated to this npCsConfigFields
      */
-    public static NPCEntity getNPCEntityFromKey(String key) {
-        for (NPCEntity npcEntity : npcEntityList)
-            if (npcEntity.key.equalsIgnoreCase(key))
+    public static NPCEntity getNPCEntityFromFields(NPCsConfigFields npCsConfigFields) {
+        for (NPCEntity npcEntity : npcEntityHashSet)
+            if (npcEntity.npCsConfigFields.getFileName().equals(npCsConfigFields.getFileName()))
                 return npcEntity;
+
         return null;
     }
 
     /**
-     * Spawns NPC based off of the values in the NPCConfig config file. Runs at startup and on reload.
-     *
-     * @param key Name of the config key for this NPC
+     * Spawns NPC based off of the values in the NPCsConfig config file. Runs at startup and on reload.
      */
-    public NPCEntity(String key) {
+    public NPCEntity(NPCsConfigFields npCsConfigFields) {
 
-        this.key = key;
+        this.npCsConfigFields = npCsConfigFields;
 
-        key += ".";
-
-        Configuration configuration = ConfigValues.npcConfig;
-
-        if (!setSpawnLocation(configuration.getString(key + NPCConfig.LOCATION))) return;
-        if (!configuration.getBoolean(key + NPCConfig.ENABLED)) return;
+        if (!setSpawnLocation(npCsConfigFields.getLocation())) return;
+        if (!npCsConfigFields.isEnabled()) return;
 
         this.villager = (Villager) spawnLocation.getWorld().spawnEntity(spawnLocation, EntityType.VILLAGER);
 
         this.villager.setRemoveWhenFarAway(true);
 
-        setName(configuration.getString(key + NPCConfig.NAME));
-        initializeRole(configuration.getString(key + NPCConfig.ROLE));
-        setProfession(configuration.getString(key + NPCConfig.TYPE));
-        setGreetings(configuration.getStringList(key + NPCConfig.GREETINGS));
-        setDialog(configuration.getStringList(key + NPCConfig.DIALOG));
-        setFarewell(configuration.getStringList(key + NPCConfig.FAREWELL));
-        setCanMove(configuration.getBoolean(key + NPCConfig.CAN_MOVE));
-        setCanTalk(configuration.getBoolean(key + NPCConfig.CAN_TALK));
-        setActivationRadius(configuration.getDouble(key + NPCConfig.ACTIVATION_RADIUS));
-        setDisappearsAtNight(configuration.getBoolean(key + NPCConfig.DISAPPEARS_AT_NIGHT));
-        setNpcInteractionType(configuration.getString(key + NPCConfig.INTERACTION_TYPE));
+        setName(npCsConfigFields.getName());
+        initializeRole(npCsConfigFields.getRole());
+        setProfession(npCsConfigFields.getProfession());
+        setGreetings(npCsConfigFields.getGreetings());
+        setDialog(npCsConfigFields.getDialog());
+        setFarewell(npCsConfigFields.getFarewell());
+        setCanMove(npCsConfigFields.isCanMove());
+        setCanTalk(npCsConfigFields.isCanTalk());
+        setActivationRadius(npCsConfigFields.getActivationRadius());
+        setDisappearsAtNight(npCsConfigFields.isCanSleep());
+        setNpcInteractionType(npCsConfigFields.getInteractionType());
 
         EntityTracker.registerNPCEntity(this);
         addNPCEntity(this);
@@ -137,6 +131,7 @@ public class NPCEntity {
             Bukkit.getEntity(roleDisplay.getUniqueId()).remove();
         initializeRole(role);
         EntityTracker.registerNPCEntity(this);
+        addNPCEntity(this);
     }
 
     /**
@@ -210,7 +205,11 @@ public class NPCEntity {
      * @param profession Career to be set
      */
     public void setProfession(String profession) {
-        this.profession = Villager.Profession.valueOf(profession);
+        try {
+            this.profession = Villager.Profession.valueOf(profession);
+        } catch (Exception ex) {
+            this.profession = Villager.Profession.NITWIT;
+        }
         this.villager.setProfession(this.profession);
     }
 
@@ -475,7 +474,12 @@ public class NPCEntity {
      * @param npcInteractionType Type of interaction enum to be set
      */
     public void setNpcInteractionType(String npcInteractionType) {
-        this.npcInteractionType = NPCInteractions.NPCInteractionType.valueOf(npcInteractionType);
+        try {
+            this.npcInteractionType = NPCInteractions.NPCInteractionType.valueOf(npcInteractionType);
+        } catch (Exception ex) {
+            new WarningMessage("NPC " + this.npCsConfigFields.getFileName() + " does not have a valid interaction type.");
+            this.npcInteractionType = NPCInteractions.NPCInteractionType.NONE;
+        }
     }
 
     /**
@@ -518,15 +522,19 @@ public class NPCEntity {
 
     /**
      * Sends a farewell message to a player from the list of farewell messages the NPCEntity has
-     *e
+     * e
+     *
      * @param player
      */
     public void sayFarewell(Player player) {
         new NPCChatBubble(selectString(this.farewell), this, player);
     }
 
-    /*
-    Selects a string from a list of strings
+    /**
+     * Selects a string from a list of strings
+     *
+     * @param strings List of string to select from
+     * @return Selected String
      */
     private String selectString(List<String> strings) {
         return strings.get(ThreadLocalRandom.current().nextInt(strings.size()));

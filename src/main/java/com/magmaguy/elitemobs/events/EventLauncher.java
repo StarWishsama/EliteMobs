@@ -1,30 +1,17 @@
-/*
- *  This program is free software: you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License as published by
- *  the Free Software Foundation, either version 3 of the License, or
- *  (at your option) any later version.
- *
- *  This program is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
- *
- *  You should have received a copy of the GNU General Public License
- *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
-
 package com.magmaguy.elitemobs.events;
 
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.config.ConfigValues;
 import com.magmaguy.elitemobs.config.EventsConfig;
+import com.magmaguy.elitemobs.events.timedevents.DeadMoonEvent;
+import com.magmaguy.elitemobs.events.timedevents.SmallTreasureGoblinEvent;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.HashMap;
 
-import static com.magmaguy.elitemobs.utils.WeightedProbablity.pickWeighedProbability;
+import static com.magmaguy.elitemobs.utils.WeightedProbability.pickWeighedProbability;
 
 public class EventLauncher {
 
@@ -45,11 +32,9 @@ public class EventLauncher {
 
                     //if enough time has passed, run the event and reset the counter
                     if (timeCheck(counter)) {
-
                         eventSelector();
                         counter = 0;
                         return;
-
                     }
 
                     counter++;
@@ -94,34 +79,27 @@ public class EventLauncher {
 
         return counter >= newTimerValue;
 
-
     }
 
     private void eventSelector() {
 
         //todo: once more events are added, randomize which one gets picked in a weighed fashion
         HashMap<String, Double> weighedConfigValues = new HashMap<>();
-        if (ConfigValues.eventsConfig.getBoolean(EventsConfig.TREASURE_GOBLIN_SMALL_ENABLED)) {
-
+        if (ConfigValues.eventsConfig.getBoolean(EventsConfig.TREASURE_GOBLIN_SMALL_ENABLED))
             weighedConfigValues.put(EventsConfig.SMALL_TREASURE_GOBLIN_EVENT_WEIGHT, ConfigValues.eventsConfig.getDouble(EventsConfig.SMALL_TREASURE_GOBLIN_EVENT_WEIGHT));
 
-        }
-
-        if (ConfigValues.eventsConfig.getBoolean(EventsConfig.DEAD_MOON_ENABLED)) {
-
+        if (ConfigValues.eventsConfig.getBoolean(EventsConfig.DEAD_MOON_ENABLED))
             weighedConfigValues.put(EventsConfig.DEAD_MOON_EVENT_WEIGHT, ConfigValues.eventsConfig.getDouble(EventsConfig.DEAD_MOON_EVENT_WEIGHT));
-
-        }
 
         if (weighedConfigValues.isEmpty()) return;
 
         switch (pickWeighedProbability(weighedConfigValues)) {
 
             case EventsConfig.SMALL_TREASURE_GOBLIN_EVENT_WEIGHT:
-                SmallTreasureGoblin.initializeEvent();
+                new SmallTreasureGoblinEvent();
                 return;
             case EventsConfig.DEAD_MOON_EVENT_WEIGHT:
-                DeadMoon.initializeEvent();
+                new DeadMoonEvent();
                 return;
 
         }

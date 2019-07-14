@@ -4,10 +4,8 @@ import com.magmaguy.elitemobs.ChatColorConverter;
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.config.ConfigValues;
 import com.magmaguy.elitemobs.config.EventsConfig;
-import com.magmaguy.elitemobs.config.ItemsUniqueConfig;
-import com.magmaguy.elitemobs.events.mobs.sharedeventproperties.BossMobDeathCountdown;
-import com.magmaguy.elitemobs.items.uniqueitems.DepthsSeeker;
-import com.magmaguy.elitemobs.mobpowers.ProjectileLocationGenerator;
+import com.magmaguy.elitemobs.items.customitems.CustomItem;
+import com.magmaguy.elitemobs.powers.ProjectileLocationGenerator;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
@@ -18,7 +16,6 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
-import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
@@ -98,8 +95,6 @@ public class Kraken implements Listener {
         krakenDamageLoop(kraken);
         krakenVisualEffectLoop(kraken);
 
-        BossMobDeathCountdown.startDeathCountdown(kraken);
-
     }
 
     private static void krakenDamageLoop(Squid kraken) {
@@ -115,8 +110,8 @@ public class Kraken implements Listener {
                 }
 
                 for (Entity entity : kraken.getNearbyEntities(16, 16, 16))
-                    if (entity instanceof Player && ((Player) entity).getGameMode().equals(GameMode.ADVENTURE) ||
-                            ((Player) entity).getGameMode().equals(GameMode.SURVIVAL))
+                    if (entity instanceof Player && (((Player) entity).getGameMode().equals(GameMode.ADVENTURE) ||
+                            ((Player) entity).getGameMode().equals(GameMode.SURVIVAL)))
                         fireballInitializer(kraken, (Player) entity);
 
             }
@@ -218,11 +213,7 @@ public class Kraken implements Listener {
         if (!event.getEntity().getType().equals(EntityType.SQUID)) return;
         if (!isKraken((Squid) event.getEntity())) return;
 
-        if (!ConfigValues.itemsUniqueConfig.getBoolean(ItemsUniqueConfig.ENABLE_KRAKEN_FISHING_ROD)) return;
-
-        DepthsSeeker depthsSeeker = new DepthsSeeker();
-        ItemStack depthSeekerItemStack = depthsSeeker.constructItemStack(10);
-        event.getEntity().getWorld().dropItem(event.getEntity().getLocation(), depthSeekerItemStack);
+        event.getEntity().getWorld().dropItem(event.getEntity().getLocation(), CustomItem.getCustomItem("depths_seeker.yml").generateItemStack(10));
         removeKraken((Squid) event.getEntity());
 
     }

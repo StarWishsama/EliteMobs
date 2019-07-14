@@ -3,18 +3,16 @@ package com.magmaguy.elitemobs.mobconstructor.mobdata.aggressivemobs;
 import com.magmaguy.elitemobs.config.ConfigValues;
 import com.magmaguy.elitemobs.config.MobPowersConfig;
 import com.magmaguy.elitemobs.mobconstructor.mobdata.PluginMobProperties;
-import com.magmaguy.elitemobs.mobpowers.defensivepowers.*;
-import com.magmaguy.elitemobs.mobpowers.majorpowers.MajorPower;
-import com.magmaguy.elitemobs.mobpowers.minorpowers.MinorPower;
-import com.magmaguy.elitemobs.mobpowers.miscellaneouspowers.*;
-import com.magmaguy.elitemobs.mobpowers.offensivepowers.*;
+import com.magmaguy.elitemobs.powers.MajorPower;
+import com.magmaguy.elitemobs.powers.MinorPower;
+import com.magmaguy.elitemobs.powers.defensivepowers.*;
+import com.magmaguy.elitemobs.powers.miscellaneouspowers.*;
+import com.magmaguy.elitemobs.powers.offensivepowers.*;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
 
 import java.util.HashSet;
-
-import static com.magmaguy.elitemobs.utils.VersionChecker.currentVersionIsUnder;
 
 public abstract class EliteMobProperties extends PluginMobProperties {
 
@@ -78,13 +76,15 @@ public abstract class EliteMobProperties extends PluginMobProperties {
             offensivePowers.add(new AttackFreeze());
         if (ConfigValues.mobPowerConfig.getBoolean(MobPowersConfig.ATTACK_GRAVITY))
             offensivePowers.add(new AttackGravity());
+        if (ConfigValues.mobPowerConfig.getBoolean(MobPowersConfig.ATTACK_LIGHTNING))
+            offensivePowers.add(new AttackLightning());
         if (ConfigValues.mobPowerConfig.getBoolean(MobPowersConfig.ATTACK_POISON))
             offensivePowers.add(new AttackPoison());
         if (ConfigValues.mobPowerConfig.getBoolean(MobPowersConfig.ATTACK_PUSH))
             offensivePowers.add(new AttackPush());
         if (ConfigValues.mobPowerConfig.getBoolean(MobPowersConfig.ATTACK_WEAKNESS))
             offensivePowers.add(new AttackWeakness());
-        if (ConfigValues.mobPowerConfig.getBoolean(MobPowersConfig.ATTACK_WEAKNESS))
+        if (ConfigValues.mobPowerConfig.getBoolean(MobPowersConfig.ATTACK_WEB))
             offensivePowers.add(new AttackWeb());
         if (ConfigValues.mobPowerConfig.getBoolean(MobPowersConfig.ATTACK_WITHER))
             offensivePowers.add(new AttackWither());
@@ -114,34 +114,28 @@ public abstract class EliteMobProperties extends PluginMobProperties {
     }
 
     public static void initializeEliteMobValues() {
-        EliteBlaze eliteBlaze = new EliteBlaze();
-        EliteCaveSpider eliteCaveSpider = new EliteCaveSpider();
-        EliteCreeper eliteCreeper = new EliteCreeper();
-        EliteEnderman eliteEnderman = new EliteEnderman();
-        EliteIronGolem eliteIronGolem = new EliteIronGolem();
-        ElitePigZombie elitePigZombie = new ElitePigZombie();
-        EliteSilverfish eliteSilverfish = new EliteSilverfish();
-        EliteSkeleton eliteSkeleton = new EliteSkeleton();
-        EliteSpider eliteSpider = new EliteSpider();
-        EliteWitch eliteWitch = new EliteWitch();
-        EliteWitherSkeleton eliteWitherSkeleton = new EliteWitherSkeleton();
-        EliteZombie eliteZombie = new EliteZombie();
-        /*
-        Post-1.8
-         */
-        if (!currentVersionIsUnder(1, 8)) {
-            EliteEndermite eliteEndermite = new EliteEndermite();
-        }
-        /*
-        Post-1.11
-         */
-        if (!currentVersionIsUnder(1, 11)) {
-            EliteStray eliteStray = new EliteStray();
-            EliteHusk eliteHusk = new EliteHusk();
-            EliteVex eliteVex = new EliteVex();
-            EliteVindicator eliteVindicator = new EliteVindicator();
-            ElitePolarBear elitePolarBear = new ElitePolarBear();
-        }
+        new EliteBlaze();
+        new EliteCaveSpider();
+        new EliteCreeper();
+        new EliteDrowned();
+        new EliteEnderman();
+        new EliteIronGolem();
+        new ElitePhantom();
+        new ElitePigZombie();
+        new EliteSilverfish();
+        new EliteSkeleton();
+        new EliteSpider();
+        new EliteWitch();
+        new EliteWitherSkeleton();
+        new EliteZombie();
+
+        new EliteEndermite();
+
+        new EliteStray();
+        new EliteHusk();
+        new EliteVex();
+        new EliteVindicator();
+        new ElitePolarBear();
     }
 
     public static boolean isValidEliteMobType(EntityType entityType) {

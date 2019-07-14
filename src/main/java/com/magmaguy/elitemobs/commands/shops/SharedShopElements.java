@@ -1,28 +1,14 @@
-/*
- *  This program is free software: you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License as published by
- *  the Free Software Foundation, either version 3 of the License, or
- *  (at your option) any later version.
- *
- *  This program is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
- *
- *  You should have received a copy of the GNU General Public License
- *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
-
 package com.magmaguy.elitemobs.commands.shops;
 
+import com.magmaguy.elitemobs.ChatColorConverter;
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.commands.guiconfig.SignatureItem;
 import com.magmaguy.elitemobs.config.ConfigValues;
 import com.magmaguy.elitemobs.config.EconomySettingsConfig;
+import com.magmaguy.elitemobs.config.TranslationConfig;
 import com.magmaguy.elitemobs.economy.EconomyHandler;
 import com.magmaguy.elitemobs.economy.UUIDFilter;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
@@ -42,11 +28,17 @@ public class SharedShopElements {
 
     public static boolean inventoryNullPointerPreventer(InventoryClickEvent event) {
 
+        if (!sellMenuNullPointPreventer(event)) return false;
+        return event.getCurrentItem().getItemMeta().hasLore();
+
+    }
+
+    public static boolean sellMenuNullPointPreventer(InventoryClickEvent event) {
+
         //Check if current item is valid
         if (event.getCurrentItem() == null) return false;
         if (event.getCurrentItem().getType().equals(Material.AIR)) return false;
-        if (event.getCurrentItem().getItemMeta() == null) return false;
-        return event.getCurrentItem().getItemMeta().hasLore();
+        return event.getCurrentItem().getItemMeta() != null;
 
     }
 
@@ -66,8 +58,19 @@ public class SharedShopElements {
             @Override
             public void run() {
 
-                player.sendMessage(ChatColor.GREEN + "You have bought " + itemDisplayName + " for " + ChatColor.DARK_GREEN + itemValue + " " + ChatColor.GREEN + ConfigValues.economyConfig.getString(EconomySettingsConfig.CURRENCY_NAME));
-                player.sendMessage(ChatColor.GREEN + "You have " + ChatColor.DARK_GREEN + EconomyHandler.checkCurrency(UUIDFilter.guessUUI(player.getName())) + " " + ChatColor.GREEN + ConfigValues.economyConfig.getString(EconomySettingsConfig.CURRENCY_NAME));
+                player.sendMessage(
+                        ChatColorConverter.convert(
+                                ConfigValues.translationConfig.getString(TranslationConfig.SHOP_BUY_MESSAGE)
+                                        .replace("$item_name", itemDisplayName)
+                                        .replace("$item_value", itemValue + "")
+                                        .replace("$currency_name", ConfigValues.economyConfig.getString(EconomySettingsConfig.CURRENCY_NAME))));
+
+                player.sendMessage(
+                        ChatColorConverter.convert(
+                                ConfigValues.translationConfig.getString(TranslationConfig.SHOP_CURRENT_BALANCE)
+                                        .replace("$currency_amount", EconomyHandler.checkCurrency(UUIDFilter.guessUUI(player.getName())) + "")
+                                        .replace("$currency_name", ConfigValues.economyConfig.getString(EconomySettingsConfig.CURRENCY_NAME))));
+
 
             }
 
@@ -83,9 +86,22 @@ public class SharedShopElements {
             @Override
             public void run() {
 
-                player.sendMessage(ChatColor.RED + "You don't have enough " + ConfigValues.economyConfig.getString(EconomySettingsConfig.CURRENCY_NAME) + "!");
-                player.sendMessage(ChatColor.GREEN + "You have " + ChatColor.DARK_GREEN + EconomyHandler.checkCurrency(UUIDFilter.guessUUI(player.getName())) + " " + ChatColor.GREEN + ConfigValues.economyConfig.getString(EconomySettingsConfig.CURRENCY_NAME));
-                player.sendMessage(ChatColor.GREEN + "That item cost " + ChatColor.DARK_GREEN + itemValue + " " + ChatColor.GREEN + ConfigValues.economyConfig.getString(EconomySettingsConfig.CURRENCY_NAME) + ".");
+                player.sendMessage(
+                        ChatColorConverter.convert(
+                                ConfigValues.translationConfig.getString(TranslationConfig.SHOP_INSUFFICIENT_FUNDS_MESSAGE)
+                                        .replace("$currency_name", ConfigValues.economyConfig.getString(EconomySettingsConfig.CURRENCY_NAME))));
+
+                player.sendMessage(
+                        ChatColorConverter.convert(
+                                ConfigValues.translationConfig.getString(TranslationConfig.SHOP_CURRENT_BALANCE)
+                                        .replace("$currency_amount", EconomyHandler.checkCurrency(UUIDFilter.guessUUI(player.getName())) + "")
+                                        .replace("$currency_name", ConfigValues.economyConfig.getString(EconomySettingsConfig.CURRENCY_NAME))));
+
+                player.sendMessage(
+                        ChatColorConverter.convert(
+                                ConfigValues.translationConfig.getString(TranslationConfig.SHOP_ITEM_PRICE)
+                                        .replace("$item_value", itemValue + "")
+                                        .replace("$currency_name", ConfigValues.economyConfig.getString(EconomySettingsConfig.CURRENCY_NAME))));
 
             }
 
@@ -93,24 +109,6 @@ public class SharedShopElements {
         }.runTaskLater(Bukkit.getPluginManager().getPlugin(MetadataHandler.ELITE_MOBS), 2);
 
         player.closeInventory();
-
-    }
-
-    public static void sellMessage(Player player, String itemDisplayName, double amountDeduced) {
-
-        player.sendMessage("You have sold " + itemDisplayName + " for " + amountDeduced + " " + ConfigValues.economyConfig.getString(EconomySettingsConfig.CURRENCY_NAME));
-
-        new BukkitRunnable() {
-
-            @Override
-            public void run() {
-
-                player.sendMessage("You have " + EconomyHandler.checkCurrency(UUIDFilter.guessUUI(player.getName())) + " " + ConfigValues.economyConfig.getString(EconomySettingsConfig.CURRENCY_NAME));
-
-            }
-
-
-        }.runTaskLater(Bukkit.getPluginManager().getPlugin(MetadataHandler.ELITE_MOBS), 2);
 
     }
 

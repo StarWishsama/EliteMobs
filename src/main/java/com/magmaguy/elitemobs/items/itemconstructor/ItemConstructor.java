@@ -3,6 +3,7 @@ package com.magmaguy.elitemobs.items.itemconstructor;
 import com.magmaguy.elitemobs.config.ConfigValues;
 import com.magmaguy.elitemobs.config.ItemsDropSettingsConfig;
 import com.magmaguy.elitemobs.mobconstructor.EliteMobEntity;
+import com.magmaguy.elitemobs.utils.ItemStackGenerator;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemFlag;
@@ -14,77 +15,11 @@ import java.util.List;
 
 public class ItemConstructor {
 
-    /*
-    For custom and unique items
-     */
-    public static ItemStack constructItem(String rawName, Material material, HashMap<Enchantment,
-            Integer> enchantments, HashMap<String, Integer> customEnchantments, List<String> potionEffects,
-                                          List<String> lore, String dropType, String scalabilityType) {
-
-        ItemStack itemStack;
-        ItemMeta itemMeta;
-
-        /*
-        Generate material
-         */
-        Material itemMaterial = MaterialGenerator.generateMaterial(material);
-
-        /*
-        Construct initial item
-         */
-        itemStack = ItemStackGenerator.generateItemStack(material);
-        itemMeta = itemStack.getItemMeta();
-
-        /*
-        Generate item enchantments
-        Note: This only applies enchantments up to a certain level, above that threshold item enchantments only exist
-        in the item lore and get interpreted by the combat system
-         */
-        if (!enchantments.isEmpty())
-            itemMeta = EnchantmentGenerator.generateEnchantments(itemMeta, enchantments);
-
-        /*
-        Generate item lore
-         */
-        itemMeta = LoreGenerator.generateLore(itemMeta, itemMaterial, enchantments, customEnchantments, potionEffects, lore);
-
-        /*
-        Remove vanilla enchantments
-         */
-        if (ConfigValues.itemsDropSettingsConfig.getBoolean(ItemsDropSettingsConfig.ENABLE_CUSTOM_ENCHANTMENT_SYSTEM))
-            itemMeta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
-
-        /*
-        Generate item name last as it relies on material type and quality
-         */
-        itemMeta.setDisplayName(NameGenerator.generateName(rawName));
-
-        /*
-        Colorize with MMO colors
-         */
-        itemStack.setItemMeta(itemMeta);
-        ItemQualityColorizer.dropQualityColorizer(itemStack);
-
-        /*
-        Add item to relevant loot lists
-         */
-        DropWeightHandler.process(dropType, itemStack);
-
-        /*
-        Handle item scalability
-         */
-        ScalabilityAssigner.assign(itemStack, rawName, material, enchantments, customEnchantments, potionEffects, lore,
-                dropType, scalabilityType);
-
-        return itemStack;
-
-    }
-
-    /*
-    For scalable items
-     */
-    public static ItemStack constructItem(String rawName, Material material, HashMap<Enchantment,
-            Integer> enchantments, HashMap<String, Integer> customEnchantments, List<String> potionEffects,
+    public static ItemStack constructItem(String rawName,
+                                          Material material,
+                                          HashMap<Enchantment, Integer> enchantments,
+                                          HashMap<String, Integer> customEnchantments,
+                                          List<String> potionEffects,
                                           List<String> lore) {
 
         ItemStack itemStack;

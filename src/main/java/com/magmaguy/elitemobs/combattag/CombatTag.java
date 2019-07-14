@@ -1,10 +1,8 @@
 package com.magmaguy.elitemobs.combattag;
 
-import com.magmaguy.elitemobs.ChatColorConverter;
 import com.magmaguy.elitemobs.EntityTracker;
 import com.magmaguy.elitemobs.MetadataHandler;
 import com.magmaguy.elitemobs.config.CombatTagConfig;
-import com.magmaguy.elitemobs.config.ConfigValues;
 import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.GameMode;
@@ -14,6 +12,8 @@ import org.bukkit.entity.Projectile;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 
 public class CombatTag implements Listener {
@@ -31,29 +31,17 @@ public class CombatTag implements Listener {
         if (player.isFlying()) {
             player.setFlying(false);
             player.spigot().sendMessage(ChatMessageType.ACTION_BAR,
-                    TextComponent.fromLegacyText(ChatColorConverter.convert(ConfigValues.combatTagConfig.getString(CombatTagConfig.COMBAT_TAG_MESSAGE))));
+                    TextComponent.fromLegacyText(CombatTagConfig.combatTagMessage));
+            player.addPotionEffect(new PotionEffect(PotionEffectType.SLOW_FALLING, 20 * 60, 0));
             new BukkitRunnable() {
                 @Override
                 public void run() {
-                    //TODO: introduce the featherfall potion effect for versions above 1.12.2
-//                    if (NameHandler.currentVersionIsUnder(13, 0)) {
                     if (!player.isOnline() || player.isDead())
                         cancel();
                     if (player.isOnGround()) {
-                        player.setFallDistance(0F);
                         cancel();
+                        player.removePotionEffect(PotionEffectType.SLOW);
                     }
-//                    } else {
-////TODO: introduce the featherfall potion effect for versions above 1.12.2
-//                        if (!player.isOnline() || player.isDead())
-//                            player.removePotionEffect(PotionEffectType.SLOW);
-//                            cancel();
-//                        if (player.isOnGround()) {
-//                            player.setFallDistance(0F);
-//                            cancel();
-//                        }
-//
-//                    }
                 }
             }.runTaskTimer(MetadataHandler.PLUGIN, 0, 1);
         }

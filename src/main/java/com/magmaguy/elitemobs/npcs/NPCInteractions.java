@@ -2,9 +2,10 @@ package com.magmaguy.elitemobs.npcs;
 
 import com.magmaguy.elitemobs.EntityTracker;
 import com.magmaguy.elitemobs.MetadataHandler;
-import com.magmaguy.elitemobs.adventurersguild.AdventurersGuildGUI;
-import com.magmaguy.elitemobs.commands.shops.CustomShopHandler;
-import com.magmaguy.elitemobs.commands.shops.ShopHandler;
+import com.magmaguy.elitemobs.adventurersguild.AdventurersGuildMenu;
+import com.magmaguy.elitemobs.commands.shops.CustomShopMenu;
+import com.magmaguy.elitemobs.commands.shops.ProceduralShopMenu;
+import org.bukkit.Material;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryOpenEvent;
@@ -29,17 +30,22 @@ public class NPCInteractions implements Listener {
 
         NPCEntity npcEntity = EntityTracker.getNPCEntity(event.getRightClicked());
         if (npcEntity == null) return;
+        if (event.getPlayer().getInventory().getItemInMainHand().getType().equals(Material.NAME_TAG)) {
+            event.setCancelled(true);
+            event.getPlayer().sendMessage("[EliteMobs] You can't rename NPCs using name tags!");
+            return;
+        }
         if (npcEntity.getIsSleeping()) return;
 
         event.setCancelled(true);
 
         switch (npcEntity.getInteractionType()) {
             case GUILD_GREETER:
-                if (event.getPlayer().hasPermission("elitemobs.adventurersguild"))
+                if (event.getPlayer().hasPermission("elitemobs.adventurersguild.menu"))
                     new BukkitRunnable() {
                         @Override
                         public void run() {
-                            AdventurersGuildGUI.mainMenu(event.getPlayer());
+                            AdventurersGuildMenu.mainMenu(event.getPlayer());
                         }
                     }.runTaskLater(MetadataHandler.PLUGIN, 1);
                 break;
@@ -47,21 +53,21 @@ public class NPCInteractions implements Listener {
                 npcEntity.sayDialog(event.getPlayer());
                 break;
             case CUSTOM_SHOP:
-                if (event.getPlayer().hasPermission("elitemobs.customshop"))
+                if (event.getPlayer().hasPermission("elitemobs.customshop.npc"))
                     new BukkitRunnable() {
                         @Override
                         public void run() {
-                            CustomShopHandler.CustomShopHandler(event.getPlayer());
+                            CustomShopMenu.customShopInitializer(event.getPlayer());
                         }
                     }.runTaskLater(MetadataHandler.PLUGIN, 1);
 
                 break;
             case PROCEDURALLY_GENERATED_SHOP:
-                if (event.getPlayer().hasPermission("elitemobs.shop"))
+                if (event.getPlayer().hasPermission("elitemobs.shop.npc"))
                     new BukkitRunnable() {
                         @Override
                         public void run() {
-                            new ShopHandler(event.getPlayer());
+                            ProceduralShopMenu.shopInitializer(event.getPlayer());
                         }
                     }.runTaskLater(MetadataHandler.PLUGIN, 1);
                 break;
@@ -82,7 +88,7 @@ public class NPCInteractions implements Listener {
         if (!event.getInventory().getType().equals(InventoryType.MERCHANT)) return;
 
         for (NPCEntity npcEntity : EntityTracker.getNPCEntities())
-            if (event.getInventory().getName().equals(npcEntity.getName())) {
+            if (event.getView().getTitle().equals(npcEntity.getName())) {
                 event.setCancelled(true);
                 return;
             }

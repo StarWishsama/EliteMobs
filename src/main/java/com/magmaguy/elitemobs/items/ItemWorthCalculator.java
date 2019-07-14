@@ -1,23 +1,10 @@
-/*
- *  This program is free software: you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License as published by
- *  the Free Software Foundation, either version 3 of the License, or
- *  (at your option) any later version.
- *
- *  This program is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
- *
- *  You should have received a copy of the GNU General Public License
- *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
-
 package com.magmaguy.elitemobs.items;
 
 import com.magmaguy.elitemobs.config.ConfigValues;
 import com.magmaguy.elitemobs.config.EconomySettingsConfig;
+import com.magmaguy.elitemobs.items.customenchantments.CustomEnchantmentCache;
 import com.magmaguy.elitemobs.items.itemconstructor.LoreGenerator;
+import com.magmaguy.elitemobs.utils.RawEnchantmentGetters;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemStack;
@@ -39,17 +26,17 @@ public class ItemWorthCalculator {
 
     }
 
-    public static double determineItemWorth(Material material, HashMap<Enchantment, Integer> enchantmentsMap) {
+//    public static double determineItemWorth(Material material, HashMap<Enchantment, Integer> enchantmentsMap) {
+//
+//        double itemWorth = 1 + Math.round((itemTypeWorth(material) + getAllEnchantmentsValue(enchantmentsMap)) * 100.0) / 100.0;
+//
+//        return itemWorth;
+//
+//    }
 
-        double itemWorth = 1 + Math.round((itemTypeWorth(material) + getAllEnchantmentsValue(enchantmentsMap)) * 100.0) / 100.0;
+    public static double determineItemWorth(Material material, HashMap<Enchantment, Integer> enchantmentsMap, List<String> potionsMap, HashMap<String, Integer> customEnchantments) {
 
-        return itemWorth;
-
-    }
-
-    public static double determineItemWorth(Material material, HashMap<Enchantment, Integer> enchantmentsMap, List<String> potionsMap) {
-
-        double itemWorth = 1 + Math.round((itemTypeWorth(material) + getAllEnchantmentsValue(enchantmentsMap) + potionEffectValue(potionsMap)) * 100.0) / 100.0;
+        double itemWorth = 1 + Math.round((itemTypeWorth(material) + getAllEnchantmentsValue(enchantmentsMap, customEnchantments) + potionEffectValue(potionsMap)) * 100.0) / 100.0;
 
         return itemWorth;
 
@@ -58,6 +45,14 @@ public class ItemWorthCalculator {
     public static double determineResaleWorth(ItemStack itemStack) {
 
         double resaleWorth = Math.round((determineItemWorth(itemStack) * (ConfigValues.economyConfig.getDouble(EconomySettingsConfig.RESALE_VALUE) / 100)) * 100.0) / 100.0;
+
+        return resaleWorth;
+
+    }
+
+    public static double determineResaleWorth(Material material, HashMap<Enchantment, Integer> enchantmentsMap, List<String> potionsMap, HashMap<String, Integer> customEnchantments) {
+
+        double resaleWorth = Math.round((determineItemWorth(material, enchantmentsMap, potionsMap, customEnchantments) * (ConfigValues.economyConfig.getDouble(EconomySettingsConfig.RESALE_VALUE) / 100)) * 100.0) / 100.0;
 
         return resaleWorth;
 
@@ -75,7 +70,7 @@ public class ItemWorthCalculator {
 
             case DIAMOND_AXE:
                 return configGetter(DIAMOND_AXE);
-            case DIAMOND_BARDING:
+            case DIAMOND_HORSE_ARMOR:
                 return configGetter(DIAMOND_BARDING);
             case DIAMOND_BLOCK:
                 return configGetter(DIAMOND_BLOCK);
@@ -93,13 +88,13 @@ public class ItemWorthCalculator {
                 return configGetter(DIAMOND_ORE);
             case DIAMOND_PICKAXE:
                 return configGetter(DIAMOND_PICKAXE);
-            case DIAMOND_SPADE:
+            case DIAMOND_SHOVEL:
                 return configGetter(DIAMOND_SPADE);
             case DIAMOND_SWORD:
                 return configGetter(DIAMOND_SWORD);
             case IRON_AXE:
                 return configGetter(IRON_AXE);
-            case IRON_BARDING:
+            case IRON_HORSE_ARMOR:
                 return configGetter(IRON_BARDING);
             case IRON_BLOCK:
                 return configGetter(IRON_BLOCK);
@@ -121,7 +116,7 @@ public class ItemWorthCalculator {
                 return configGetter(IRON_ORE);
             case IRON_PICKAXE:
                 return configGetter(IRON_PICKAXE);
-            case IRON_SPADE:
+            case IRON_SHOVEL:
                 return configGetter(IRON_SPADE);
             case IRON_SWORD:
                 return configGetter(IRON_SWORD);
@@ -139,39 +134,39 @@ public class ItemWorthCalculator {
                 return configGetter(CHAINMAIL_LEGGINGS);
             case STONE_SWORD:
                 return configGetter(STONE_SWORD);
-            case STONE_SPADE:
+            case STONE_SHOVEL:
                 return configGetter(STONE_SPADE);
             case STONE_AXE:
                 return configGetter(STONE_AXE);
             case STONE_PICKAXE:
                 return configGetter(STONE_PICKAXE);
-            case GOLD_AXE:
+            case GOLDEN_AXE:
                 return configGetter(GOLD_AXE);
-            case GOLD_BARDING:
+            case GOLDEN_HORSE_ARMOR:
                 return configGetter(GOLD_BARDING);
             case GOLD_BLOCK:
                 return configGetter(GOLD_BLOCK);
-            case GOLD_BOOTS:
+            case GOLDEN_BOOTS:
                 return configGetter(GOLD_BOOTS);
-            case GOLD_CHESTPLATE:
+            case GOLDEN_CHESTPLATE:
                 return configGetter(GOLD_CHESTPLATE);
-            case GOLD_HELMET:
+            case GOLDEN_HELMET:
                 return configGetter(GOLD_HELMET);
-            case GOLD_HOE:
+            case GOLDEN_HOE:
                 return configGetter(GOLD_HOE);
             case GOLD_INGOT:
                 return configGetter(GOLD_INGOT);
-            case GOLD_LEGGINGS:
+            case GOLDEN_LEGGINGS:
                 return configGetter(GOLD_LEGGINGS);
             case GOLD_NUGGET:
                 return configGetter(GOLD_NUGGET);
             case GOLD_ORE:
                 return configGetter(GOLD_ORE);
-            case GOLD_PICKAXE:
+            case GOLDEN_PICKAXE:
                 return configGetter(GOLD_PICKAXE);
-            case GOLD_SPADE:
+            case GOLDEN_SHOVEL:
                 return configGetter(GOLD_SPADE);
-            case GOLD_SWORD:
+            case GOLDEN_SWORD:
                 return configGetter(GOLD_SWORD);
             case GOLDEN_APPLE:
                 return configGetter(GOLDEN_APPLE);
@@ -185,13 +180,13 @@ public class ItemWorthCalculator {
                 return configGetter(LEATHER_HELMET);
             case LEATHER_LEGGINGS:
                 return configGetter(LEATHER_LEGGINGS);
-            case WOOD_SWORD:
+            case WOODEN_SWORD:
                 return configGetter(WOOD_SWORD);
-            case WOOD_AXE:
+            case WOODEN_AXE:
                 return configGetter(WOOD_AXE);
-            case WOOD_PICKAXE:
+            case WOODEN_PICKAXE:
                 return configGetter(WOOD_PICKAXE);
-            case WOOD_HOE:
+            case WOODEN_HOE:
                 return configGetter(WOOD_HOE);
             default:
                 return configGetter(OTHER);
@@ -204,33 +199,37 @@ public class ItemWorthCalculator {
 
         double enchantmentsValue = 0;
 
-        if (!itemStack.getEnchantments().isEmpty()) {
+        Map<Enchantment, Integer> enchantments = RawEnchantmentGetters.vanillaEnchantmentsList(itemStack);
 
-            for (Map.Entry<Enchantment, Integer> entry : itemStack.getEnchantments().entrySet()) {
+        if (!itemStack.getEnchantments().isEmpty())
+            for (Enchantment enchantment : enchantments.keySet())
+                enchantmentsValue += enchantmentWorthGetter(enchantment) * enchantments.get(enchantment);
 
-                enchantmentsValue += enchantmentWorthGetter(entry.getKey()) * entry.getValue();
+        if (CustomEnchantmentCache.hunterEnchantment.hasCustomEnchantment(itemStack))
+            enchantmentsValue += configGetter(HUNTER);
 
-            }
-
-        }
+        if (CustomEnchantmentCache.flamethrowerEnchantment.hasCustomEnchantment(itemStack))
+            enchantmentsValue += configGetter(FLAMETHROWER);
 
         return enchantmentsValue;
 
     }
 
-    private static double getAllEnchantmentsValue(HashMap<Enchantment, Integer> enchantmentsMap) {
+    private static double getAllEnchantmentsValue(HashMap<Enchantment, Integer> enchantmentsMap, HashMap<String, Integer> customEnchantments) {
 
         double enchantmentsValue = 0;
 
-        if (!enchantmentsMap.isEmpty()) {
-
-            for (Enchantment enchantment : enchantmentsMap.keySet()) {
-
+        if (!enchantmentsMap.isEmpty())
+            for (Enchantment enchantment : enchantmentsMap.keySet())
                 enchantmentsValue += enchantmentWorthGetter(enchantment) * enchantmentsMap.get(enchantment);
 
+        if (!customEnchantments.isEmpty())
+            for (String customEnchantment : customEnchantments.keySet()) {
+                if (customEnchantment.equalsIgnoreCase(CustomEnchantmentCache.hunterEnchantment.key))
+                    enchantmentsValue += configGetter(HUNTER);
+                else if (customEnchantment.equalsIgnoreCase(CustomEnchantmentCache.flamethrowerEnchantment.key))
+                    enchantmentsValue += configGetter(FLAMETHROWER);
             }
-
-        }
 
         return enchantmentsValue;
 
@@ -335,7 +334,7 @@ public class ItemWorthCalculator {
 
         double potionEffectValue = 0;
 
-        if (potionString == null || potionString.isEmpty()) return potionEffectValue;
+        if (potionString == null || potionString.isEmpty() || potionString.get(0) == null) return potionEffectValue;
 
         for (String string : potionString)
             potionEffectValue += getPotionEffectValue(string.split(",")[0]) * (Integer.parseInt(string.split(",")[1]) + 1);

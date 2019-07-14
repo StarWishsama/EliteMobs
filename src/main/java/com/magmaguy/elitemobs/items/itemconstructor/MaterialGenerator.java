@@ -22,23 +22,19 @@ public class MaterialGenerator {
 
     public static Material generateMaterial(double itemTier){
 
-        List<Material> localValidMaterials = intializeValidProceduralMaterials();
+        List<Material> localValidMaterials = initializeValidProceduralMaterials();
 
-        if (localValidMaterials.isEmpty()) intializeValidProceduralMaterials();
+        if (localValidMaterials.isEmpty()) initializeValidProceduralMaterials();
 
         if (itemTier < CombatSystem.DIAMOND_TIER_LEVEL) {
-
-            localValidMaterials.remove(DIAMOND);
             localValidMaterials.remove(DIAMOND_AXE);
-            localValidMaterials.remove(DIAMOND_BARDING);
-            localValidMaterials.remove(DIAMOND_BLOCK);
+            localValidMaterials.remove(DIAMOND_HORSE_ARMOR);
             localValidMaterials.remove(DIAMOND_CHESTPLATE);
             localValidMaterials.remove(DIAMOND_HELMET);
             localValidMaterials.remove(DIAMOND_HOE);
             localValidMaterials.remove(DIAMOND_LEGGINGS);
-            localValidMaterials.remove(DIAMOND_ORE);
             localValidMaterials.remove(DIAMOND_PICKAXE);
-            localValidMaterials.remove(DIAMOND_SPADE);
+            localValidMaterials.remove(DIAMOND_SHOVEL);
             localValidMaterials.remove(DIAMOND_SWORD);
             localValidMaterials.remove(DIAMOND_BOOTS);
 
@@ -47,18 +43,14 @@ public class MaterialGenerator {
         if (itemTier < CombatSystem.IRON_TIER_LEVEL) {
 
             localValidMaterials.remove(IRON_AXE);
-            localValidMaterials.remove(IRON_BARDING);
-            localValidMaterials.remove(IRON_BLOCK);
+            localValidMaterials.remove(IRON_HORSE_ARMOR);
             localValidMaterials.remove(IRON_BOOTS);
             localValidMaterials.remove(IRON_CHESTPLATE);
             localValidMaterials.remove(IRON_HELMET);
             localValidMaterials.remove(IRON_HOE);
-            localValidMaterials.remove(IRON_INGOT);
             localValidMaterials.remove(IRON_LEGGINGS);
-            localValidMaterials.remove(IRON_NUGGET);
-            localValidMaterials.remove(IRON_ORE);
             localValidMaterials.remove(IRON_PICKAXE);
-            localValidMaterials.remove(IRON_SPADE);
+            localValidMaterials.remove(IRON_SHOVEL);
             localValidMaterials.remove(IRON_SWORD);
 
         }
@@ -71,7 +63,7 @@ public class MaterialGenerator {
             localValidMaterials.remove(CHAINMAIL_LEGGINGS);
             localValidMaterials.remove(STONE_SWORD);
             localValidMaterials.remove(STONE_HOE);
-            localValidMaterials.remove(STONE_SPADE);
+            localValidMaterials.remove(STONE_SHOVEL);
             localValidMaterials.remove(STONE_PICKAXE);
             localValidMaterials.remove(STONE_AXE);
 
@@ -85,7 +77,7 @@ public class MaterialGenerator {
 
     }
 
-    private static List<Material> intializeValidProceduralMaterials(){
+    private static List<Material> initializeValidProceduralMaterials() {
 
         List<Material> validMaterials = new ArrayList<>();
 

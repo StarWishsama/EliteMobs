@@ -1,21 +1,27 @@
 package com.magmaguy.elitemobs;
 
-import com.magmaguy.elitemobs.adventurersguild.AdventurersGuildGUI;
-import com.magmaguy.elitemobs.adventurersguild.MaxHealthBoost;
+import com.magmaguy.elitemobs.adventurersguild.AdventurersGuildMenu;
+import com.magmaguy.elitemobs.adventurersguild.MaxHealthHandler;
 import com.magmaguy.elitemobs.adventurersguild.SpawnControl;
+import com.magmaguy.elitemobs.antiexploit.*;
+import com.magmaguy.elitemobs.api.*;
 import com.magmaguy.elitemobs.collateralminecraftchanges.*;
 import com.magmaguy.elitemobs.combattag.CombatTag;
+import com.magmaguy.elitemobs.combattag.TeleportTag;
 import com.magmaguy.elitemobs.commands.LootGUI;
-import com.magmaguy.elitemobs.commands.shops.CustomShopHandler;
-import com.magmaguy.elitemobs.commands.shops.ItemSaleEvent;
-import com.magmaguy.elitemobs.commands.shops.ShopHandler;
+import com.magmaguy.elitemobs.commands.shops.BuyOrSellMenu;
+import com.magmaguy.elitemobs.commands.shops.CustomShopMenu;
+import com.magmaguy.elitemobs.commands.shops.ProceduralShopMenu;
+import com.magmaguy.elitemobs.commands.shops.SellMenu;
 import com.magmaguy.elitemobs.config.*;
-import com.magmaguy.elitemobs.events.DeadMoon;
-import com.magmaguy.elitemobs.events.SmallTreasureGoblin;
-import com.magmaguy.elitemobs.events.actionevents.BalrogEvent;
-import com.magmaguy.elitemobs.events.actionevents.FaeEvent;
+import com.magmaguy.elitemobs.custombosses.CustomBossEntity;
+import com.magmaguy.elitemobs.events.EliteEvent;
 import com.magmaguy.elitemobs.events.actionevents.KrakenEvent;
-import com.magmaguy.elitemobs.events.mobs.*;
+import com.magmaguy.elitemobs.events.actionevents.MiningEvent;
+import com.magmaguy.elitemobs.events.actionevents.TreeChoppingEvent;
+import com.magmaguy.elitemobs.events.mobs.Kraken;
+import com.magmaguy.elitemobs.events.timedevents.DeadMoonEvent;
+import com.magmaguy.elitemobs.events.timedevents.SmallTreasureGoblinEvent;
 import com.magmaguy.elitemobs.items.*;
 import com.magmaguy.elitemobs.items.customenchantments.FlamethrowerEnchantment;
 import com.magmaguy.elitemobs.mobconstructor.CombatSystem;
@@ -23,25 +29,32 @@ import com.magmaguy.elitemobs.mobconstructor.MergeHandler;
 import com.magmaguy.elitemobs.mobconstructor.displays.DamageDisplay;
 import com.magmaguy.elitemobs.mobconstructor.displays.DisplayMob;
 import com.magmaguy.elitemobs.mobconstructor.displays.HealthDisplay;
-import com.magmaguy.elitemobs.mobpowers.AggroPrevention;
-import com.magmaguy.elitemobs.mobpowers.defensivepowers.InvulnerabilityArrow;
-import com.magmaguy.elitemobs.mobpowers.defensivepowers.InvulnerabilityFallDamage;
-import com.magmaguy.elitemobs.mobpowers.defensivepowers.InvulnerabilityFire;
-import com.magmaguy.elitemobs.mobpowers.defensivepowers.InvulnerabilityKnockback;
-import com.magmaguy.elitemobs.mobpowers.majorpowers.*;
-import com.magmaguy.elitemobs.mobpowers.miscellaneouspowers.BonusLoot;
-import com.magmaguy.elitemobs.mobpowers.miscellaneouspowers.Corpse;
-import com.magmaguy.elitemobs.mobpowers.miscellaneouspowers.Implosion;
-import com.magmaguy.elitemobs.mobpowers.miscellaneouspowers.Taunt;
-import com.magmaguy.elitemobs.mobpowers.offensivepowers.*;
 import com.magmaguy.elitemobs.mobs.passive.*;
 import com.magmaguy.elitemobs.mobspawning.NaturalMobSpawnEventHandler;
 import com.magmaguy.elitemobs.npcs.NPCDamageEvent;
 import com.magmaguy.elitemobs.npcs.NPCInteractions;
 import com.magmaguy.elitemobs.npcs.chatter.NPCProximitySensor;
+import com.magmaguy.elitemobs.powers.AggroPrevention;
+import com.magmaguy.elitemobs.powers.bosspowers.*;
+import com.magmaguy.elitemobs.powers.defensivepowers.InvulnerabilityArrow;
+import com.magmaguy.elitemobs.powers.defensivepowers.InvulnerabilityFallDamage;
+import com.magmaguy.elitemobs.powers.defensivepowers.InvulnerabilityFire;
+import com.magmaguy.elitemobs.powers.defensivepowers.InvulnerabilityKnockback;
+import com.magmaguy.elitemobs.powers.majorpowers.skeleton.SkeletonPillar;
+import com.magmaguy.elitemobs.powers.majorpowers.skeleton.SkeletonTrackingArrow;
+import com.magmaguy.elitemobs.powers.majorpowers.zombie.ZombieBloat;
+import com.magmaguy.elitemobs.powers.majorpowers.zombie.ZombieFriends;
+import com.magmaguy.elitemobs.powers.majorpowers.zombie.ZombieNecronomicon;
+import com.magmaguy.elitemobs.powers.majorpowers.zombie.ZombieParents;
+import com.magmaguy.elitemobs.powers.miscellaneouspowers.BonusLoot;
+import com.magmaguy.elitemobs.powers.miscellaneouspowers.Corpse;
+import com.magmaguy.elitemobs.powers.miscellaneouspowers.Implosion;
+import com.magmaguy.elitemobs.powers.miscellaneouspowers.Taunt;
+import com.magmaguy.elitemobs.powers.offensivepowers.*;
 import com.magmaguy.elitemobs.powerstances.EffectEventHandlers;
 import com.magmaguy.elitemobs.powerstances.VisualEffectObfuscator;
-import com.magmaguy.elitemobs.utils.VersionChecker;
+import com.magmaguy.elitemobs.quests.QuestsMenu;
+import com.magmaguy.elitemobs.quests.QuestsTracker;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.PluginManager;
@@ -69,12 +82,22 @@ public class EventsRegistrer {
 
         //Mob loot
         pluginManager.registerEvents(new DefaultDropsHandler(), plugin);
+        pluginManager.registerEvents(new ItemLootShower(), plugin);
 
         //potion effects
         pluginManager.registerEvents(new PotionEffectApplier(), plugin);
 
-        //getloot AdventurersGuildGUI
+        //getloot AdventurersGuildMenu
         pluginManager.registerEvents(new LootGUI(), plugin);
+
+        /*
+        Register API events
+         */
+        pluginManager.registerEvents(new EliteMobDamagedByPlayerEvent.EntityDamagedByEntityFilter(), plugin);
+        pluginManager.registerEvents(new EliteMobDeathEvent.EliteMobDeathEventFilter(), plugin);
+        pluginManager.registerEvents(new EliteMobTargetPlayerEvent.EliteMobTargetPlayerEventFilter(), plugin);
+        pluginManager.registerEvents(new EliteMobDamageEvent.EliteMobDamageEventFilter(), plugin);
+        pluginManager.registerEvents(new PlayerDamagedByEliteMobEvent.PlayerDamagedByEliteMobEventFilter(), plugin);
 
         /*
         While these powers could be registered in a more automated way, I realized that it's also a bad way of getting
@@ -95,6 +118,7 @@ public class EventsRegistrer {
         pluginManager.registerEvents(new AttackFireball(), plugin);
         pluginManager.registerEvents(new AttackFreeze(), plugin);
         pluginManager.registerEvents(new AttackGravity(), plugin);
+        pluginManager.registerEvents(new AttackLightning(), plugin);
         pluginManager.registerEvents(new AttackPoison(), plugin);
         pluginManager.registerEvents(new AttackPush(), plugin);
         pluginManager.registerEvents(new AttackWeakness(), plugin);
@@ -109,7 +133,20 @@ public class EventsRegistrer {
         pluginManager.registerEvents(new ZombieFriends(), plugin);
         pluginManager.registerEvents(new ZombieNecronomicon(), plugin);
         pluginManager.registerEvents(new ZombieParents(), plugin);
-        pluginManager.registerEvents(new ZombieTeamRocket(), plugin);
+
+        //boss powers
+        pluginManager.registerEvents(new SpiritWalk(), plugin);
+        pluginManager.registerEvents(new GoldShotgun(), plugin);
+        pluginManager.registerEvents(new GoldExplosion(), plugin);
+        pluginManager.registerEvents(new Flamethrower(), plugin);
+        pluginManager.registerEvents(new FlamePyre(), plugin);
+        pluginManager.registerEvents(new SummonTheReturned(), plugin);
+        pluginManager.registerEvents(new HyperLoot(), plugin);
+        pluginManager.registerEvents(new SummonRaug(), plugin);
+        pluginManager.registerEvents(new SummonTheReturned(), plugin);
+
+        //Custom bosses
+        pluginManager.registerEvents(new CustomBossEntity.CustomBossEntityEvents(), plugin);
 
         //Metadata (player purger)
         pluginManager.registerEvents(new MetadataHandler(), plugin);
@@ -137,50 +174,40 @@ public class EventsRegistrer {
         }
 
         //Shops
-        pluginManager.registerEvents(new ShopHandler(), plugin);
-        pluginManager.registerEvents(new CustomShopHandler(), plugin);
-        pluginManager.registerEvents(new ItemSaleEvent(), plugin);
+        pluginManager.registerEvents(new ProceduralShopMenu(), plugin);
+        pluginManager.registerEvents(new CustomShopMenu(), plugin);
+        pluginManager.registerEvents(new BuyOrSellMenu(), plugin);
+        pluginManager.registerEvents(new SellMenu(), plugin);
 
         //Minecraft behavior canceller
         pluginManager.registerEvents(new ChunkUnloadMetadataPurge(), plugin);
         pluginManager.registerEvents(new EntityDeathDataFlusher(), plugin);
         if (ConfigValues.defaultConfig.getBoolean(DefaultConfig.CREEPER_PASSIVE_DAMAGE_PREVENTER))
             pluginManager.registerEvents(new PreventCreeperPassiveEntityDamage(), plugin);
-        //Prevent exploits
-        //Prevent mount exploit
-        if (ConfigValues.defaultConfig.getBoolean(DefaultConfig.PREVENT_MOUNT_EXPLOIT))
-            pluginManager.registerEvents(new PreventMountExploit(), plugin);
-        //Prevent darkroom exploit
-        if (ConfigValues.defaultConfig.getBoolean(DefaultConfig.PREVENT_DARKROOM_EXPLOIT))
-            pluginManager.registerEvents(new PreventDarkroomExploit(), plugin);
-        //Prevent tower exploit
-        if (ConfigValues.defaultConfig.getBoolean(DefaultConfig.PREVENT_TOWER_EXPLOIT))
-            pluginManager.registerEvents(new PreventTowerExploit(), plugin);
-        if (ConfigValues.defaultConfig.getBoolean(DefaultConfig.PREVENT_ENDERMAN_HEIGHT_EXPLOIT))
-            pluginManager.registerEvents(new PreventEndermanHeightExploit(), plugin);
+
+        //Antiexploits
+        pluginManager.registerEvents(new PreventMountExploit(), plugin);
+        pluginManager.registerEvents(new PreventDarkroomExploit(), plugin);
+        pluginManager.registerEvents(new PreventLargeDarkroomExploit(), plugin);
+        pluginManager.registerEvents(new PreventDensityExploit(), plugin);
+        pluginManager.registerEvents(new PreventTowerExploit(), plugin);
+        pluginManager.registerEvents(new PreventEndermanHeightExploit(), plugin);
 
 
-        if (!VersionChecker.currentVersionIsUnder(11, 0)) {
-            //Initialize custom events
-            pluginManager.registerEvents(new SmallTreasureGoblin(), plugin);
-            pluginManager.registerEvents(new TreasureGoblin(), plugin);
-            pluginManager.registerEvents(new DeadMoon(), plugin);
-            pluginManager.registerEvents(new TheReturned(), plugin);
-            pluginManager.registerEvents(new ZombieKing(), plugin);
-            pluginManager.registerEvents(new com.magmaguy.elitemobs.mobpowers.bosspowers.SpiritWalk(), plugin);
+        //Initialize events
+        pluginManager.registerEvents(new EliteEvent.AbstractEliteEventEvents(), plugin);
+        pluginManager.registerEvents(new DeadMoonEvent(), plugin);
+        pluginManager.registerEvents(new SmallTreasureGoblinEvent(), plugin);
 
-            if (ConfigValues.eventsConfig.getBoolean(EventsConfig.KRAKEN_ENABLED)) {
-                pluginManager.registerEvents(new Kraken(), plugin);
-                pluginManager.registerEvents(new KrakenEvent(), plugin);
-            }
-            if (ConfigValues.eventsConfig.getBoolean(EventsConfig.BALROG_ENABLED)) {
-                pluginManager.registerEvents(new Balrog(), plugin);
-                pluginManager.registerEvents(new BalrogEvent(), plugin);
-            }
-            if (ConfigValues.eventsConfig.getBoolean(EventsConfig.FAE_ENABLED)) {
-                pluginManager.registerEvents(new FaeEvent(), plugin);
-                pluginManager.registerEvents(new Fae(), plugin);
-            }
+        if (ConfigValues.eventsConfig.getBoolean(EventsConfig.KRAKEN_ENABLED)) {
+            pluginManager.registerEvents(new Kraken(), plugin);
+            pluginManager.registerEvents(new KrakenEvent(), plugin);
+        }
+        if (ConfigValues.eventsConfig.getBoolean(EventsConfig.BALROG_ENABLED)) {
+            pluginManager.registerEvents(new MiningEvent(), plugin);
+        }
+        if (ConfigValues.eventsConfig.getBoolean(EventsConfig.FAE_ENABLED)) {
+            pluginManager.registerEvents(new TreeChoppingEvent(), plugin);
         }
 
 
@@ -194,15 +221,21 @@ public class EventsRegistrer {
         pluginManager.registerEvents(new FlamethrowerEnchantment(), plugin);
 
         //Initialize adventurer's guild
-        if (ConfigValues.adventurersGuildConfig.getBoolean(AdventurersGuildConfig.ENABLE_ADVENTURERS_GUILD))
-            pluginManager.registerEvents(new AdventurersGuildGUI(), plugin);
-        if (ConfigValues.adventurersGuildConfig.getBoolean(AdventurersGuildConfig.ADD_MAX_HEALTH))
-            pluginManager.registerEvents(new MaxHealthBoost(), plugin);
+        if (AdventurersGuildConfig.enableAdventurersGuild)
+            pluginManager.registerEvents(new AdventurersGuildMenu(), plugin);
+        if (AdventurersGuildConfig.addMaxHealth)
+            pluginManager.registerEvents(new MaxHealthHandler(), plugin);
         pluginManager.registerEvents(new SpawnControl(), plugin);
+        //register quests
+        pluginManager.registerEvents(new QuestsMenu(), plugin);
+        pluginManager.registerEvents(new QuestsTracker(), plugin);
 
         //Combat tag
-        if (ConfigValues.combatTagConfig.getBoolean(CombatTagConfig.ENABLE_COMBAT_TAG))
+        if (CombatTagConfig.enableCombatTag)
             pluginManager.registerEvents(new CombatTag(), plugin);
+        if (CombatTagConfig.enableTeleportTimer)
+            pluginManager.registerEvents(new TeleportTag(), plugin);
+
 
         //Prevent elitemob on elitemob aggro
         pluginManager.registerEvents(new AggroPrevention(), plugin);

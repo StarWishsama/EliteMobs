@@ -27,7 +27,6 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
-import org.bukkit.event.entity.ItemMergeEvent;
 import org.bukkit.event.inventory.InventoryPickupItemEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -35,8 +34,8 @@ import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.*;
 
+import static org.bukkit.Material.CHICKEN;
 import static org.bukkit.Material.FEATHER;
-import static org.bukkit.Material.RAW_CHICKEN;
 
 /**
  * Created by MagmaGuy on 19/12/2016.
@@ -78,7 +77,7 @@ public class ChickenHandler implements Listener {
             int dropMinAmount = (int) dropChance;
 
             ItemStack featherStack = new ItemStack(FEATHER, (random.nextInt(2) + 1));
-            ItemStack poultryStack = new ItemStack(RAW_CHICKEN, 1);
+            ItemStack poultryStack = new ItemStack(CHICKEN, 1);
 
             for (int i = 0; i < dropMinAmount; i++) {
 
@@ -158,31 +157,6 @@ public class ChickenHandler implements Listener {
                 event.getItem().getItemStack().getItemMeta().getLore().equals(lore)) {
 
             event.setCancelled(true);
-
-        }
-
-    }
-
-    @EventHandler
-    public void onSuperEggMerge(ItemMergeEvent event) {
-
-        if (event.getEntity().getItemStack().hasItemMeta() && event.getEntity().getItemStack().getItemMeta().hasLore() &&
-                event.getEntity().getItemStack().getItemMeta().getLore().equals(lore)) {
-
-            new BukkitRunnable() {
-
-                @Override
-                public void run() {
-
-                    if (event.getTarget().isValid()) {
-
-                        event.getTarget().remove();
-
-                    }
-
-                }
-
-            }.runTaskLater(MetadataHandler.PLUGIN, 20 * 60);
 
         }
 

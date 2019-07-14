@@ -1,27 +1,26 @@
 package com.magmaguy.elitemobs.config;
 
-import org.bukkit.configuration.Configuration;
+import org.bukkit.configuration.file.FileConfiguration;
+
+import java.io.File;
 
 public class CombatTagConfig {
 
-    public static final String CONFIG_NAME = "CombatTag.yml";
+    public static boolean enableCombatTag;
+    public static String combatTagMessage;
+    public static boolean enableTeleportTimer;
+    public static int teleportTimerDuration;
 
-    public static final String ENABLE_COMBAT_TAG = "Enable combat tag";
-    public static final String COMBAT_TAG_MESSAGE = "Combat tag message";
+    public static void initializeConfig() {
+        File file = ConfigurationEngine.fileCreator("CombatTag.yml");
+        FileConfiguration fileConfiguration = ConfigurationEngine.fileConfigurationCreator(file);
 
-    CustomConfigLoader customConfigLoader = new CustomConfigLoader();
-    private Configuration configuration = customConfigLoader.getCustomConfig(CONFIG_NAME);
+        enableCombatTag = ConfigurationEngine.setBoolean(fileConfiguration, "Enable combat tag", true);
+        combatTagMessage = ConfigurationEngine.setString(fileConfiguration, "Combat tag message", "&c[EliteMobs] Combat tag activated!");
+        enableTeleportTimer = ConfigurationEngine.setBoolean(fileConfiguration, "Enable adventurers guild teleport timer", true);
+        teleportTimerDuration = ConfigurationEngine.setInt(fileConfiguration, "Teleport timer duration", 5);
 
-    public void initializeConfig(){
-
-        configuration.addDefault(ENABLE_COMBAT_TAG, true);
-        configuration.addDefault(COMBAT_TAG_MESSAGE, "&c[EliteMobs] Combat tag activated!");
-
-        customConfigLoader.getCustomConfig(CONFIG_NAME).options().copyDefaults(true);
-        UnusedNodeHandler.clearNodes(configuration);
-        customConfigLoader.saveDefaultCustomConfig(CONFIG_NAME);
-        customConfigLoader.saveCustomConfig(CONFIG_NAME);
-
+        ConfigurationEngine.fileSaverOnlyDefaults(fileConfiguration, file);
     }
 
 }

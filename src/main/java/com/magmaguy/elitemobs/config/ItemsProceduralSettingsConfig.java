@@ -101,52 +101,52 @@ public class ItemsProceduralSettingsConfig {
         ));
         configuration.addDefault(PROCEDURAL_ITEM_VALID_MATERIALS, Arrays.asList(
                 "DIAMOND_SWORD",
-                "GOLD_SWORD",
+                "GOLDEN_SWORD",
                 "IRON_SWORD",
                 "STONE_SWORD",
-                "WOOD_SWORD",
+                "WOODEN_SWORD",
                 "BOW",
                 "DIAMOND_PICKAXE",
-                "GOLD_PICKAXE",
+                "GOLDEN_PICKAXE",
                 "IRON_PICKAXE",
                 "STONE_PICKAXE",
-                "WOOD_PICKAXE",
-                "DIAMOND_SPADE",
-                "GOLD_SPADE",
-                "IRON_SPADE",
-                "STONE_SPADE",
-                "WOOD_SPADE",
+                "WOODEN_PICKAXE",
+                "DIAMOND_SHOVEL",
+                "GOLDEN_SHOVEL",
+                "IRON_SHOVEL",
+                "STONE_SHOVEL",
+                "WOODEN_SHOVEL",
                 "DIAMOND_HOE",
-                "GOLD_HOE",
+                "GOLDEN_HOE",
                 "IRON_HOE",
                 "STONE_HOE",
-                "WOOD_HOE",
+                "WOODEN_HOE",
                 "DIAMOND_AXE",
-                "GOLD_AXE",
+                "GOLDEN_AXE",
                 "IRON_AXE",
                 "STONE_AXE",
-                "WOOD_AXE",
+                "WOODEN_AXE",
                 "SHEARS",
                 "SHIELD",
                 "FISHING_ROD",
                 "CHAINMAIL_HELMET",
                 "DIAMOND_HELMET",
-                "GOLD_HELMET",
+                "GOLDEN_HELMET",
                 "IRON_HELMET",
                 "LEATHER_HELMET",
                 "CHAINMAIL_CHESTPLATE",
                 "DIAMOND_CHESTPLATE",
-                "GOLD_CHESTPLATE",
+                "GOLDEN_CHESTPLATE",
                 "IRON_CHESTPLATE",
                 "LEATHER_CHESTPLATE",
                 "CHAINMAIL_LEGGINGS",
                 "DIAMOND_LEGGINGS",
-                "GOLD_LEGGINGS",
+                "GOLDEN_LEGGINGS",
                 "IRON_LEGGINGS",
                 "LEATHER_LEGGINGS",
                 "CHAINMAIL_BOOTS",
                 "DIAMOND_BOOTS",
-                "GOLD_BOOTS",
+                "GOLDEN_BOOTS",
                 "IRON_BOOTS",
                 "LEATHER_BOOTS"
         ));
@@ -244,7 +244,7 @@ public class ItemsProceduralSettingsConfig {
 
 
         configuration.addDefault(ARROW_DAMAGE_BOOL, true);
-        configuration.addDefault(ARROW_DAMAGE_MAX_LEVEL, 10);
+        configuration.addDefault(ARROW_DAMAGE_MAX_LEVEL, 100);
 
         configuration.addDefault(ARROW_FIRE_BOOL, true);
         configuration.addDefault(ARROW_FIRE_MAX_LEVEL, 1);
@@ -257,13 +257,13 @@ public class ItemsProceduralSettingsConfig {
         configuration.addDefault(BINDING_CURSE_BOOL, true);
 
         configuration.addDefault(DAMAGE_ALL_BOOL, true);
-        configuration.addDefault(DAMAGE_ALL_MAX_LEVEL, 10);
+        configuration.addDefault(DAMAGE_ALL_MAX_LEVEL, 100);
 
         configuration.addDefault(DAMAGE_ARTHROPODS_BOOL, true);
-        configuration.addDefault(DAMAGE_ARTHROPODS_MAX_LEVEL, 5);
+        configuration.addDefault(DAMAGE_ARTHROPODS_MAX_LEVEL, 50);
 
         configuration.addDefault(DAMAGE_UNDEAD_BOOL, true);
-        configuration.addDefault(DAMAGE_UNDEAD_MAX_LEVEL, 5);
+        configuration.addDefault(DAMAGE_UNDEAD_MAX_LEVEL, 50);
 
         configuration.addDefault(DEPTH_STRIDER_BOOL, true);
         configuration.addDefault(DEPTH_STRIDER_MAX_LEVEL, 3);
@@ -301,10 +301,10 @@ public class ItemsProceduralSettingsConfig {
         configuration.addDefault(OXYGEN_MAX_LEVEL, 3);
 
         configuration.addDefault(PROTECTION_ENVIRONMENTAL_BOOL, true);
-        configuration.addDefault(PROTECTION_ENVIRONMENTAL_MAX_LEVEL, 10);
+        configuration.addDefault(PROTECTION_ENVIRONMENTAL_MAX_LEVEL, 100);
 
         configuration.addDefault(PROTECTION_EXPLOSIONS_BOOL, true);
-        configuration.addDefault(PROTECTION_EXPLOSIONS_MAX_LEVEL, 4);
+        configuration.addDefault(PROTECTION_EXPLOSIONS_MAX_LEVEL, 50);
 
         configuration.addDefault(PROTECTION_FALL_BOOL, true);
         configuration.addDefault(PROTECTION_FALL_MAX_LEVEL, 4);
@@ -313,7 +313,7 @@ public class ItemsProceduralSettingsConfig {
         configuration.addDefault(PROTECTION_FIRE_MAX_LEVEL, 4);
 
         configuration.addDefault(PROTECTION_PROJECTILE_BOOL, true);
-        configuration.addDefault(PROTECTION_PROJECTILE_MAX_LEVEL, 4);
+        configuration.addDefault(PROTECTION_PROJECTILE_MAX_LEVEL, 50);
 
         configuration.addDefault(SILK_TOUCH_BOOL, true);
 
@@ -334,7 +334,7 @@ public class ItemsProceduralSettingsConfig {
         configuration.addDefault(SWORD_MATERIAL_NAME, "Sword");
         configuration.addDefault(BOW_MATERIAL_NAME, "Bow");
         configuration.addDefault(PICKAXE_MATERIAL_NAME, "Pickaxe");
-        configuration.addDefault(SPADE_MATERIAL_NAME, "Spade");
+        configuration.addDefault(SPADE_MATERIAL_NAME, "Shovel");
         configuration.addDefault(HOE_MATERIAL_NAME, "Hoe");
         configuration.addDefault(AXE_MATERIAL_NAME, "Axe");
         configuration.addDefault(FISHING_ROD_MATERIAL_NAME, "Fishing Rod");

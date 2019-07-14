@@ -1,36 +1,26 @@
-/*
- *  This program is free software: you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License as published by
- *  the Free Software Foundation, either version 3 of the License, or
- *  (at your option) any later version.
- *
- *  This program is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
- *
- *  You should have received a copy of the GNU General Public License
- *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
-
 package com.magmaguy.elitemobs.commands;
 
 import com.magmaguy.elitemobs.MetadataHandler;
-import com.magmaguy.elitemobs.commands.shops.CustomShopHandler;
-import com.magmaguy.elitemobs.commands.shops.ShopHandler;
+import com.magmaguy.elitemobs.commands.npc.NPCCommands;
+import com.magmaguy.elitemobs.commands.shops.CustomShopMenu;
+import com.magmaguy.elitemobs.commands.shops.ProceduralShopMenu;
+import com.magmaguy.elitemobs.config.AdventurersGuildConfig;
 import com.magmaguy.elitemobs.config.ConfigValues;
 import com.magmaguy.elitemobs.config.DefaultConfig;
-import com.magmaguy.elitemobs.config.NPCConfig;
 import com.magmaguy.elitemobs.config.TranslationConfig;
-import com.magmaguy.elitemobs.npcs.NPCEntity;
-import com.magmaguy.elitemobs.utils.Round;
+import com.magmaguy.elitemobs.items.ShareItem;
+import com.magmaguy.elitemobs.quests.PlayerQuest;
+import com.magmaguy.elitemobs.quests.QuestCommand;
+import com.magmaguy.elitemobs.quests.QuestsMenu;
 import org.bukkit.Bukkit;
-import org.bukkit.Location;
+import org.bukkit.WorldCreator;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.Player;
+
+import java.io.File;
 
 /**
  * Created by MagmaGuy on 21/01/2017.
@@ -64,7 +54,6 @@ public class CommandHandler implements CommandExecutor {
     private final static String SET_MAX_TIER = "elitemobs.config.setmaxtier";
     private final static String GET_TIER = "elitemobs.gettier";
     private final static String CHECK_MAX_TIER = "elitemobs.checkmaxtier";
-    private final static String ADVENTURERS_GUILD = "elitemobs.adventurersguild";
 
     @Override
     public boolean onCommand(CommandSender commandSender, Command command, String label, String[] args) {
@@ -73,8 +62,10 @@ public class CommandHandler implements CommandExecutor {
             case "ag":
             case "adventurersguild":
             case "adventurerguild":
-                if (userPermCheck(ADVENTURERS_GUILD, commandSender))
-                    new AdventurersGuildCommand((Player) commandSender);
+                new AdventurersGuildCommand((Player) commandSender);
+                return true;
+            case "shareitem":
+                ShareItem.showOnChat((Player) commandSender);
                 return true;
         }
 
@@ -89,13 +80,12 @@ public class CommandHandler implements CommandExecutor {
             case "spawn":
             case "spawnmob":
                 if (permCheck(SPAWNMOB, commandSender))
-                    SpawnMobCommandHandler.spawnMob(commandSender, args);
+                    SpawnCommand.spawnMob(commandSender, args);
                 return true;
             case "ag":
             case "adventurersguild":
             case "adventurerguild":
-                if (userPermCheck(ADVENTURERS_GUILD, commandSender))
-                    new AdventurersGuildCommand((Player) commandSender);
+                new AdventurersGuildCommand((Player) commandSender);
                 return true;
             case "stats":
                 if (permCheck(STATS, commandSender))
@@ -115,16 +105,16 @@ public class CommandHandler implements CommandExecutor {
                 return true;
             case "shop":
             case "store":
-                if (userPermCheck(SHOP, commandSender)) {
-                    new ShopHandler((Player) commandSender);
+                if (userPermCheck("elitemobs.shop.command", commandSender)) {
+                    ProceduralShopMenu.shopInitializer((Player) commandSender);
                 }
                 return true;
             case "customshop":
             case "cshop":
             case "customstore":
             case "cstore":
-                if (userPermCheck(CUSTOMSHOP, commandSender)) {
-                    CustomShopHandler.CustomShopHandler((Player) commandSender);
+                if (userPermCheck("elitemobs.customshop.command", commandSender)) {
+                    CustomShopMenu.customShopInitializer((Player) commandSender);
                 }
                 return true;
             case "wallet":
@@ -162,7 +152,7 @@ public class CommandHandler implements CommandExecutor {
             case "reload":
             case "restart":
                 if (permCheck(RELOAD_CONFIGS, commandSender))
-                    ReloadHandler.reloadCommand(commandSender, args);
+                    ReloadHandler.reload(commandSender);
                 return true;
             case "killall":
             case "kill":
@@ -188,11 +178,6 @@ public class CommandHandler implements CommandExecutor {
             case "startevent":
             case "triggerevent":
                 TriggerEventHandler.triggerEventCommand(commandSender, args);
-                return true;
-            case "spawnbossmob":
-            case "spawnboss":
-                if (userPermCheck(SPAWNMOB, commandSender))
-                    SpawnMobCommandHandler.spawnBossMob((Player) commandSender, args);
                 return true;
             case "gettier":
             case "spawntier":
@@ -223,110 +208,63 @@ public class CommandHandler implements CommandExecutor {
                 if (permCheck(CURRENCY_SET, commandSender))
                     CurrencyCommandsHandler.setCommand(commandSender, args);
             case ("npc"):
-                if (args.length <= 1) {
-                    commandSender.sendMessage("[EliteMobs] Invalid command syntax. Valid options:");
-                    commandSender.sendMessage("/em npc set [npc key]");
-                    commandSender.sendMessage("/em npc remove [npc key]");
-                    return true;
-                } else {
-                    if (args[1].equalsIgnoreCase("set")) {
+                NPCCommands.parseNPCCommand(commandSender, args);
+                return true;
+            case "autosetup":
+                if (!permCheck("elitemobs.autosetup", commandSender)) return true;
+                File folder = new File(Bukkit.getWorldContainer().getAbsolutePath());
+                File[] listOfFiles = folder.listFiles();
+                boolean worldFolderExists = false;
 
-                        if (permCheck("elitemobs.npc.set", commandSender)) {
-
-                            if (args.length == 2) {
-                                commandSender.sendMessage("[EliteMobs] Invalid command syntax. Valid options:");
-                                commandSender.sendMessage("/em npc set [npc key]");
-                                commandSender.sendMessage("Valid keys: " + ConfigValues.npcConfig.getKeys(false).toString());
-                                return true;
-                            }
-
-                            Location playerLocation = ((Player) commandSender).getLocation();
-
-                            String location = playerLocation.getWorld().getName() + ","
-                                    + Round.twoDecimalPlaces(playerLocation.getX()) + ","
-                                    + Round.twoDecimalPlaces(playerLocation.getY()) + ","
-                                    + Round.twoDecimalPlaces(playerLocation.getZ()) + ","
-                                    + Round.twoDecimalPlaces(playerLocation.getYaw()) + ","
-                                    + Round.twoDecimalPlaces(playerLocation.getPitch());
-
-                            try {
-                                try {
-                                    NPCEntity.removeNPCEntity(NPCEntity.getNPCEntityFromKey(args[2]));
-                                } catch (Exception e) {
-                                }
-                                NPCConfig npcConfig = new NPCConfig();
-                                npcConfig.configuration.set(args[2] + "." + NPCConfig.ENABLED, true);
-                                npcConfig.configuration.set(args[2] + "." + NPCConfig.LOCATION, location);
-                                npcConfig.customConfigLoader.saveCustomConfig(NPCConfig.CONFIG_NAME);
-                                ConfigValues.npcConfig.set(args[2] + "." + NPCConfig.ENABLED, true);
-                                ConfigValues.npcConfig.set(args[2] + "." + NPCConfig.LOCATION, location);
-                                new NPCEntity(args[2]);
-                            } catch (Exception e) {
-                                commandSender.sendMessage("[EliteMobs] Invalid key. Valid options:");
-                                commandSender.sendMessage("Valid keys: " + ConfigValues.npcConfig.getKeys(false).toString());
-                                return true;
-                            }
-                        }
-
-                        return true;
-
-                    }
-                    if (args[1].equalsIgnoreCase("remove")) {
-
-                        if (permCheck("elitemobs.npc.remove", commandSender)) {
-
-                            if (args.length == 2) {
-                                commandSender.sendMessage("[EliteMobs] Invalid command syntax. Valid options:");
-                                commandSender.sendMessage("/em npc remove [npc key]");
-                                commandSender.sendMessage("Valid keys: " + ConfigValues.npcConfig.getKeys(false).toString());
-                                return true;
-                            }
-
-                            try {
-                                NPCEntity.removeNPCEntity(NPCEntity.getNPCEntityFromKey(args[2]));
-                                NPCConfig npcConfig = new NPCConfig();
-                                npcConfig.configuration.set(args[2] + "." + NPCConfig.ENABLED, false);
-                                npcConfig.customConfigLoader.saveCustomConfig(NPCConfig.CONFIG_NAME);
-                                ConfigValues.npcConfig.set(args[2] + "." + NPCConfig.ENABLED, false);
-                                new NPCEntity(args[2]);
-                            } catch (Exception e) {
-                                commandSender.sendMessage("[EliteMobs] Invalid key. Valid options:");
-                                commandSender.sendMessage("Valid keys: " + ConfigValues.npcConfig.getKeys(false).toString());
-                                return true;
-                            }
-                        }
-
-                        return true;
-                    }
-
-                    if (args[1].equalsIgnoreCase("add")) {
-
-                        if (permCheck("elitemobs.npc.add", commandSender)) {
-
-                            if (args.length == 2) {
-                                commandSender.sendMessage("[EliteMobs] Invalid command syntax. Valid options:");
-                                commandSender.sendMessage("/em npc add [npc key]");
-                                commandSender.sendMessage("Valid keys: " + ConfigValues.npcConfig.getKeys(false).toString());
-                                return true;
-                            }
-
-                            try {
-                                if (!ConfigValues.npcConfig.getKeys(false).contains(args[2])) throw new Exception();
-                                NPCConfig npcConfig = new NPCConfig();
-                                npcConfig.configuration.set(args[2] + "." + NPCConfig.ENABLED, true);
-                                npcConfig.customConfigLoader.saveCustomConfig(NPCConfig.CONFIG_NAME);
-                                ConfigValues.npcConfig.set(args[2] + "." + NPCConfig.ENABLED, true);
-                                new NPCEntity(args[2]);
-                            } catch (Exception e) {
-                                commandSender.sendMessage("[EliteMobs] Invalid key. Valid options:");
-                                commandSender.sendMessage("Valid keys: " + ConfigValues.npcConfig.getKeys(false).toString());
-                                return true;
-                            }
-                        }
-
-                        return true;
+                for (File listOfFile : listOfFiles) {
+                    if (listOfFile.isDirectory() &&
+                            listOfFile.getName().equals(AdventurersGuildConfig.guildWorldName)) {
+                        commandSender.sendMessage("[EliteMobs] World " + AdventurersGuildConfig.guildWorldName + " found! Loading it in...");
+                        worldFolderExists = true;
+                        break;
                     }
                 }
+
+                if (!worldFolderExists) {
+                    commandSender.sendMessage("[EliteMobs] Could not import world " + AdventurersGuildConfig.guildWorldName + " ! " +
+                            "It is not in your worlds directory. If you wish to use the default world, you can find the link to download it on the resource page over at https://www.spigotmc.org/resources/%E2%9A%94elitemobs%E2%9A%94.40090/");
+                    return true;
+                }
+
+                Bukkit.createWorld(new WorldCreator(AdventurersGuildConfig.guildWorldName));
+                commandSender.sendMessage("[EliteMobs] Successfully imported the world!");
+                commandSender.sendMessage("[EliteMobs] Now all you need to do is add the permission elitemobs.user to your users and you're all set!");
+                return true;
+            case "quest":
+                if (!userPermCheck("elitemobs.adventurersguild", commandSender)) return true;
+                if (args.length == 1) {
+                    QuestCommand.doMainQuestCommand((Player) commandSender);
+                    return true;
+                }
+                if (args[1].equalsIgnoreCase("status")) {
+                    QuestCommand.doQuestTrackCommand((Player) commandSender);
+                    return true;
+                }
+                if (args[1].equalsIgnoreCase("cancel") && args[3].equalsIgnoreCase("confirm")) {
+                    PlayerQuest.removePlayersInQuests(Bukkit.getPlayer(args[2]));
+                    if (QuestsMenu.playerHasPendingQuest(Bukkit.getPlayer(args[2]))) {
+                        PlayerQuest playerQuest = QuestsMenu.getPlayerQuestPair(Bukkit.getPlayer(args[2]));
+                        try {
+                            PlayerQuest.addPlayerInQuests(Bukkit.getPlayer(args[2]), playerQuest.clone());
+                        } catch (CloneNotSupportedException e) {
+                            e.printStackTrace();
+                        }
+                        playerQuest.getQuestObjective().sendQuestStartMessage(Bukkit.getPlayer(args[2]));
+                        QuestsMenu.removePlayerQuestPair(Bukkit.getPlayer(args[2]));
+                    }
+                    return true;
+                }
+            case "showitem":
+            case "itemshow":
+            case "shareitem":
+            case "itemshare":
+            case "share":
+                ShareItem.showOnChat((Player) commandSender);
                 return true;
             default:
                 validCommands(commandSender);
@@ -409,7 +347,7 @@ public class CommandHandler implements CommandExecutor {
             if (silentPermCheck(SIMLOOT, commandSender))
                 player.sendMessage("/elitemobs simloot [mob level]");
             if (silentPermCheck(GETLOOT, commandSender))
-                player.sendMessage("/elitemobs getloot [loot name (no loot name = AdventurersGuildGUI)]");
+                player.sendMessage("/elitemobs getloot [loot name (no loot name = AdventurersGuildMenu)]");
             if (silentPermCheck(GIVELOOT, commandSender))
                 player.sendMessage("/elitemobs giveloot [player name] random/[loot_name_underscore_for_spaces]");
             if (silentPermCheck(SPAWNMOB, commandSender))
@@ -445,9 +383,7 @@ public class CommandHandler implements CommandExecutor {
     }
 
     private static boolean silentPermCheck(String permission, CommandSender commandSender) {
-
         return commandSender.hasPermission(permission);
-
     }
 
 
